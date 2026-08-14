@@ -1,0 +1,899 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10ACEEE64A78595414F7E8B8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF7D06AA59B0557643E4ED /* Client.swift */; };
+		17B45DF9479DECA8C36DCFE5 /* BusinessAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2CFFA24206DFF8003C44705 /* BusinessAnalytics.swift */; };
+		1A592F633A3169EBADB49571 /* ConsultationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9E4DDDFD93F4A27DE3F619 /* ConsultationRecord.swift */; };
+		1AE1206B3BC85F3E4A32CF5C /* AIWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC5C3B48FDD9FE5F0A11F6A /* AIWorkspaceView.swift */; };
+		2E76330C1DC5B18437D75BA3 /* MediaAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CF5AAB78BBA4C41D075502 /* MediaAsset.swift */; };
+		332F23F373548A70CD3B8EDF /* ClientsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFAA31108C052A686CDFD4 /* ClientsView.swift */; };
+		33CD0FA22BEC5AD0E04A2011 /* SeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E304B9492761D8513E67C56C /* SeedService.swift */; };
+		3629D81EF8D99AE4B14FF83A /* OrderPaymentLedgerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2DA96EE6E5786AE216B6840 /* OrderPaymentLedgerService.swift */; };
+		3C65CD372A67AA07641BE2E2 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */; };
+		40ACF9D5E35C8AB76E415733 /* ConsultationActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395C5045C8D384FC4F7F5A47 /* ConsultationActivity.swift */; };
+		40ED81D2C34B25820CB77672 /* EntitlementRedemption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21526D37D4B6115B28CF67C2 /* EntitlementRedemption.swift */; };
+		41B686991D803DA0B1E9760A /* ServicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C74E9FCE7DEE195D81468A8 /* ServicesView.swift */; };
+		48E64DBA06E77E714D851A21 /* BusinessFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30F2F6736F4B1F74AF01703 /* BusinessFlowUITests.swift */; };
+		4BCC65A786469C588A08BD9F /* Appointment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0329CDBC957A4D0432E45C /* Appointment.swift */; };
+		62328D4CC8E2FAB45C52CD08 /* AppSecurityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C233D7251C5001671F0964 /* AppSecurityManager.swift */; };
+		6386685069967823A96FCF7F /* ScheduleSyncDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4E27EC82BE74CB1392ABB3 /* ScheduleSyncDocument.swift */; };
+		6A104FA7711BD3220426ACFB /* VoiceIntakeRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED5DBFD2ADB7825D396C65A /* VoiceIntakeRecorder.swift */; };
+		6BD61FE5863BF222CE644279 /* AudioSelfTestRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5A24AB94D425EBBC95D5C2 /* AudioSelfTestRecorder.swift */; };
+		6D4971A8DB3245B24C59233B /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5186EAA05B42A9C42722AC90 /* BackupService.swift */; };
+		703E64CBA13A4087D3E2CAD1 /* BrandTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E47FDA6A27D0A02D0FA4BC /* BrandTheme.swift */; };
+		724ABEA11F40AFBDA869A42D /* SafetyCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242F642D46C06470C1F150BE /* SafetyCenterView.swift */; };
+		765B94BF7F28482C79C03D12 /* AppMigrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436AAA8BDA428D5425F56542 /* AppMigrationService.swift */; };
+		79181B7E04FC9F458315807D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB014DCF5E64A78625094F28 /* AppState.swift */; };
+		7B60639AF3EE9052B848D505 /* DomainEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA63A8FDB870ADC1BA5940E /* DomainEnums.swift */; };
+		7DB97720F01CA0B1291C6101 /* RecordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5691833369F407BA9CEB8911 /* RecordsView.swift */; };
+		8348D4A6FF35DB3B95567C97 /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379400B8AFDBE91813F10238 /* ScheduleView.swift */; };
+		83B59D2CE3871458B38264D5 /* ConsentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10BB644E93FAC133AB9A4FA /* ConsentRecord.swift */; };
+		8E737C4B8FA0B6973D6C9499 /* PaymentLedgerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37D1FF1A9A3B9C6ABAAE529 /* PaymentLedgerService.swift */; };
+		90E9E0DF61FDE297D106EC42 /* LocalAIModelPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD26DE0EDEECDBF72D4E64A1 /* LocalAIModelPolicy.swift */; };
+		9369C61602D14D98C1A5A9E0 /* TestDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9895FDCF70EAB1F2DF2BC095 /* TestDataService.swift */; };
+		9D90FCD78B33BDCBD84F5316 /* PaymentTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B245DD0545B1D8FCEBA4D9 /* PaymentTransaction.swift */; };
+		A62EAE56F031C3AFEF60425F /* OrderPaymentTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490C6B8D0ED4339D25CEC51 /* OrderPaymentTransaction.swift */; };
+		A77E46278A96E1023D19FC1B /* LocalAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33227B231177C0B0B4DA7960 /* LocalAIService.swift */; };
+		ADAB437773539D3E2B2BACD0 /* PasswordCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B3DA7501F0F848CAA36EF1 /* PasswordCrypto.swift */; };
+		B27800A52D29CE4E8C094702 /* LocalAudioTranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC1971699DE226276A99F11 /* LocalAudioTranscriptionService.swift */; };
+		B684078FF0923152F0B59EC2 /* AppModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD2EF91E084667F15B424989 /* AppModelContainer.swift */; };
+		C8E6CAB6AE5BF8E3DF7EEFDB /* BusinessFlowMacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C444440562D16F4F0865A24 /* BusinessFlowMacUITests.swift */; };
+		C972C92BB77C08BC87E18E54 /* NotificationPresentationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924ADB3541A80B51BABBCEDF /* NotificationPresentationDelegate.swift */; };
+		CAC5D7C7EA6E9F1DC1A12C10 /* SoulTowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A742DA1A40E4EE14C832E10 /* SoulTowerApp.swift */; };
+		D1F255B78EE4CD44EA2B1503 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85048C9FD64B3B890A5C40B8 /* DashboardView.swift */; };
+		D4FE4A604E000F38FCBA1D6C /* ServiceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD2E3FA8E667C90261F26F0 /* ServiceItem.swift */; };
+		D5801D26818FAEBA6C8B431C /* BusinessReportDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A39F23FA8F3D288BC14435A /* BusinessReportDocument.swift */; };
+		D89D9C690C19F4ABC35820CC /* MediaStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD103D7F0B2839E52294B3CF /* MediaStorageService.swift */; };
+		DDA0C02944D4EE850AA6ED9B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A74AEBF2E4B56D4734F94EF /* RootView.swift */; };
+		E216E63737B0B7D4BF42A5A8 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3428CD51F46F67A7524ED6 /* NotificationScheduler.swift */; };
+		E2986F01778C38C14CCEBA5C /* DefaultBusinessRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3594A56DD2324C4CAD2ED4 /* DefaultBusinessRules.swift */; };
+		E48D76166FCEAACD7301BA9F /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D773687EB60D8C4672A79AE6 /* KeychainStore.swift */; };
+		E6A2D0431718E54E7D135D4A /* ServiceOrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF01027021DCF93455CE96B7 /* ServiceOrdersView.swift */; };
+		E728BACDA87D6D8A0C309585 /* BusinessRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D795B7D6CEFFC9A9D68005AE /* BusinessRulesTests.swift */; };
+		E8F45A675D2DA08CAC570E74 /* VoiceIntakeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31312B759B5323BA5F5A41F4 /* VoiceIntakeModels.swift */; };
+		EA370EFD21DC6422A849D8E7 /* PaymentTransactionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA0782F48BEC35BB6CB9A28 /* PaymentTransactionEditorView.swift */; };
+		EB8544B568A1329E742779C8 /* ServiceOrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC499A888A1AFDF256B5D8BB /* ServiceOrderDetailView.swift */; };
+		EC1A7311FD0E32058031AAF4 /* BusinessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70C8CCF7B4667F48EB58509A /* BusinessView.swift */; };
+		EC830F9B53A57190B03E28CD /* ConsultationWorkflowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55BD389EC3A2ABC0EB261B72 /* ConsultationWorkflowService.swift */; };
+		ED10A58251DD8A5074F54307 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2D8788331599DDF2B32A91 /* AppLockView.swift */; };
+		F26FF88CAD3D38E9A21F03A2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280009AB57EBCA04C2596BAA /* SettingsView.swift */; };
+		F37F82EE7DF886A98FC3301B /* VoiceIntakeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA2093BF17F34361FB89B80 /* VoiceIntakeView.swift */; };
+		F62119E6F9D813E661D4D66B /* ServiceOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36F074463FB227726E5A90C /* ServiceOrder.swift */; };
+		FDC665E46691663EBB6149E2 /* ServiceOrderChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAE02F8B4FA1F6FD3ACF48 /* ServiceOrderChange.swift */; };
+		FE1C80BFFB0E6DBA62DE9073 /* ConsultationSummaryRevision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7838F6AF22ACD74629283EE7 /* ConsultationSummaryRevision.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		845CF9A39A08D2B7DFBDE7C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19514AE816DFCE1F553BC40 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F992498230DD259E2770D15B;
+			remoteInfo = SoulTower;
+		};
+		A6E8F4DCC655A22495EFB492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19514AE816DFCE1F553BC40 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F992498230DD259E2770D15B;
+			remoteInfo = SoulTower;
+		};
+		D263848F40D4F7AA9892F742 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19514AE816DFCE1F553BC40 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F992498230DD259E2770D15B;
+			remoteInfo = SoulTower;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0AA63A8FDB870ADC1BA5940E /* DomainEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainEnums.swift; sourceTree = "<group>"; };
+		0C444440562D16F4F0865A24 /* BusinessFlowMacUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessFlowMacUITests.swift; sourceTree = "<group>"; };
+		1DA0782F48BEC35BB6CB9A28 /* PaymentTransactionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentTransactionEditorView.swift; sourceTree = "<group>"; };
+		21526D37D4B6115B28CF67C2 /* EntitlementRedemption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementRedemption.swift; sourceTree = "<group>"; };
+		242F642D46C06470C1F150BE /* SafetyCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyCenterView.swift; sourceTree = "<group>"; };
+		280009AB57EBCA04C2596BAA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2A742DA1A40E4EE14C832E10 /* SoulTowerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoulTowerApp.swift; sourceTree = "<group>"; };
+		2EA2093BF17F34361FB89B80 /* VoiceIntakeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceIntakeView.swift; sourceTree = "<group>"; };
+		31312B759B5323BA5F5A41F4 /* VoiceIntakeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceIntakeModels.swift; sourceTree = "<group>"; };
+		33227B231177C0B0B4DA7960 /* LocalAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAIService.swift; sourceTree = "<group>"; };
+		379400B8AFDBE91813F10238 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
+		395C5045C8D384FC4F7F5A47 /* ConsultationActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationActivity.swift; sourceTree = "<group>"; };
+		3C74E9FCE7DEE195D81468A8 /* ServicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesView.swift; sourceTree = "<group>"; };
+		436AAA8BDA428D5425F56542 /* AppMigrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMigrationService.swift; sourceTree = "<group>"; };
+		46BF7D06AA59B0557643E4ED /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		47894E394D0E91B36536B03B /* SoulTowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoulTowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		48CF5AAB78BBA4C41D075502 /* MediaAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaAsset.swift; sourceTree = "<group>"; };
+		4CC5C3B48FDD9FE5F0A11F6A /* AIWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIWorkspaceView.swift; sourceTree = "<group>"; };
+		5186EAA05B42A9C42722AC90 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		55BD389EC3A2ABC0EB261B72 /* ConsultationWorkflowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationWorkflowService.swift; sourceTree = "<group>"; };
+		5691833369F407BA9CEB8911 /* RecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsView.swift; sourceTree = "<group>"; };
+		5A39F23FA8F3D288BC14435A /* BusinessReportDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessReportDocument.swift; sourceTree = "<group>"; };
+		5FD2E3FA8E667C90261F26F0 /* ServiceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceItem.swift; sourceTree = "<group>"; };
+		65617B30E3E567B56B4D1A8E /* SoulTower.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SoulTower.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A74AEBF2E4B56D4734F94EF /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		70C8CCF7B4667F48EB58509A /* BusinessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessView.swift; sourceTree = "<group>"; };
+		7838F6AF22ACD74629283EE7 /* ConsultationSummaryRevision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationSummaryRevision.swift; sourceTree = "<group>"; };
+		7A2D8788331599DDF2B32A91 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockView.swift; sourceTree = "<group>"; };
+		85048C9FD64B3B890A5C40B8 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		88B245DD0545B1D8FCEBA4D9 /* PaymentTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentTransaction.swift; sourceTree = "<group>"; };
+		8CC1971699DE226276A99F11 /* LocalAudioTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAudioTranscriptionService.swift; sourceTree = "<group>"; };
+		924ADB3541A80B51BABBCEDF /* NotificationPresentationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPresentationDelegate.swift; sourceTree = "<group>"; };
+		93CAE02F8B4FA1F6FD3ACF48 /* ServiceOrderChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrderChange.swift; sourceTree = "<group>"; };
+		9490C6B8D0ED4339D25CEC51 /* OrderPaymentTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderPaymentTransaction.swift; sourceTree = "<group>"; };
+		9895FDCF70EAB1F2DF2BC095 /* TestDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDataService.swift; sourceTree = "<group>"; };
+		9E9862EB8F535E3A56A1FE80 /* SoulTowerUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SoulTowerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0C233D7251C5001671F0964 /* AppSecurityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSecurityManager.swift; sourceTree = "<group>"; };
+		A2DA96EE6E5786AE216B6840 /* OrderPaymentLedgerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderPaymentLedgerService.swift; sourceTree = "<group>"; };
+		AA3428CD51F46F67A7524ED6 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
+		AB014DCF5E64A78625094F28 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		AD26DE0EDEECDBF72D4E64A1 /* LocalAIModelPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAIModelPolicy.swift; sourceTree = "<group>"; };
+		AED5DBFD2ADB7825D396C65A /* VoiceIntakeRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceIntakeRecorder.swift; sourceTree = "<group>"; };
+		B10BB644E93FAC133AB9A4FA /* ConsentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentRecord.swift; sourceTree = "<group>"; };
+		B2CFFA24206DFF8003C44705 /* BusinessAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessAnalytics.swift; sourceTree = "<group>"; };
+		B30F2F6736F4B1F74AF01703 /* BusinessFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessFlowUITests.swift; sourceTree = "<group>"; };
+		B36F074463FB227726E5A90C /* ServiceOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrder.swift; sourceTree = "<group>"; };
+		BB3594A56DD2324C4CAD2ED4 /* DefaultBusinessRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBusinessRules.swift; sourceTree = "<group>"; };
+		CB0329CDBC957A4D0432E45C /* Appointment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appointment.swift; sourceTree = "<group>"; };
+		CB9E4DDDFD93F4A27DE3F619 /* ConsultationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationRecord.swift; sourceTree = "<group>"; };
+		CC5A24AB94D425EBBC95D5C2 /* AudioSelfTestRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSelfTestRecorder.swift; sourceTree = "<group>"; };
+		CD4E27EC82BE74CB1392ABB3 /* ScheduleSyncDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSyncDocument.swift; sourceTree = "<group>"; };
+		CDAFAA31108C052A686CDFD4 /* ClientsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientsView.swift; sourceTree = "<group>"; };
+		D37D1FF1A9A3B9C6ABAAE529 /* PaymentLedgerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentLedgerService.swift; sourceTree = "<group>"; };
+		D773687EB60D8C4672A79AE6 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		D795B7D6CEFFC9A9D68005AE /* BusinessRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessRulesTests.swift; sourceTree = "<group>"; };
+		D7E47FDA6A27D0A02D0FA4BC /* BrandTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandTheme.swift; sourceTree = "<group>"; };
+		DF01027021DCF93455CE96B7 /* ServiceOrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrdersView.swift; sourceTree = "<group>"; };
+		E304B9492761D8513E67C56C /* SeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedService.swift; sourceTree = "<group>"; };
+		E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
+		E8B3DA7501F0F848CAA36EF1 /* PasswordCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordCrypto.swift; sourceTree = "<group>"; };
+		EC499A888A1AFDF256B5D8BB /* ServiceOrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrderDetailView.swift; sourceTree = "<group>"; };
+		F7C69A0EF7AF51E055A4FCCA /* SoulTowerMacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoulTowerMacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD103D7F0B2839E52294B3CF /* MediaStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaStorageService.swift; sourceTree = "<group>"; };
+		FD2EF91E084667F15B424989 /* AppModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModelContainer.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0B4DB5B322A6287C6EE48E20 /* SoulTowerMacUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0C444440562D16F4F0865A24 /* BusinessFlowMacUITests.swift */,
+			);
+			path = SoulTowerMacUITests;
+			sourceTree = "<group>";
+		};
+		23897068A81AF3092CA92CD2 /* SoulTowerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				B30F2F6736F4B1F74AF01703 /* BusinessFlowUITests.swift */,
+			);
+			path = SoulTowerUITests;
+			sourceTree = "<group>";
+		};
+		24DC38402612FD8FB1E25EA5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4CC5C3B48FDD9FE5F0A11F6A /* AIWorkspaceView.swift */,
+				7A2D8788331599DDF2B32A91 /* AppLockView.swift */,
+				70C8CCF7B4667F48EB58509A /* BusinessView.swift */,
+				CDAFAA31108C052A686CDFD4 /* ClientsView.swift */,
+				85048C9FD64B3B890A5C40B8 /* DashboardView.swift */,
+				1DA0782F48BEC35BB6CB9A28 /* PaymentTransactionEditorView.swift */,
+				5691833369F407BA9CEB8911 /* RecordsView.swift */,
+				6A74AEBF2E4B56D4734F94EF /* RootView.swift */,
+				242F642D46C06470C1F150BE /* SafetyCenterView.swift */,
+				379400B8AFDBE91813F10238 /* ScheduleView.swift */,
+				EC499A888A1AFDF256B5D8BB /* ServiceOrderDetailView.swift */,
+				DF01027021DCF93455CE96B7 /* ServiceOrdersView.swift */,
+				3C74E9FCE7DEE195D81468A8 /* ServicesView.swift */,
+				280009AB57EBCA04C2596BAA /* SettingsView.swift */,
+				2EA2093BF17F34361FB89B80 /* VoiceIntakeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		39BE3308922FDA3DF53F033B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CB0329CDBC957A4D0432E45C /* Appointment.swift */,
+				46BF7D06AA59B0557643E4ED /* Client.swift */,
+				B10BB644E93FAC133AB9A4FA /* ConsentRecord.swift */,
+				395C5045C8D384FC4F7F5A47 /* ConsultationActivity.swift */,
+				CB9E4DDDFD93F4A27DE3F619 /* ConsultationRecord.swift */,
+				7838F6AF22ACD74629283EE7 /* ConsultationSummaryRevision.swift */,
+				0AA63A8FDB870ADC1BA5940E /* DomainEnums.swift */,
+				21526D37D4B6115B28CF67C2 /* EntitlementRedemption.swift */,
+				48CF5AAB78BBA4C41D075502 /* MediaAsset.swift */,
+				9490C6B8D0ED4339D25CEC51 /* OrderPaymentTransaction.swift */,
+				88B245DD0545B1D8FCEBA4D9 /* PaymentTransaction.swift */,
+				5FD2E3FA8E667C90261F26F0 /* ServiceItem.swift */,
+				B36F074463FB227726E5A90C /* ServiceOrder.swift */,
+				93CAE02F8B4FA1F6FD3ACF48 /* ServiceOrderChange.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		44DA610CA4A66E0D87B8C4EF /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				436AAA8BDA428D5425F56542 /* AppMigrationService.swift */,
+				A0C233D7251C5001671F0964 /* AppSecurityManager.swift */,
+				AB014DCF5E64A78625094F28 /* AppState.swift */,
+				CC5A24AB94D425EBBC95D5C2 /* AudioSelfTestRecorder.swift */,
+				E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */,
+				5186EAA05B42A9C42722AC90 /* BackupService.swift */,
+				B2CFFA24206DFF8003C44705 /* BusinessAnalytics.swift */,
+				5A39F23FA8F3D288BC14435A /* BusinessReportDocument.swift */,
+				55BD389EC3A2ABC0EB261B72 /* ConsultationWorkflowService.swift */,
+				BB3594A56DD2324C4CAD2ED4 /* DefaultBusinessRules.swift */,
+				D773687EB60D8C4672A79AE6 /* KeychainStore.swift */,
+				AD26DE0EDEECDBF72D4E64A1 /* LocalAIModelPolicy.swift */,
+				33227B231177C0B0B4DA7960 /* LocalAIService.swift */,
+				8CC1971699DE226276A99F11 /* LocalAudioTranscriptionService.swift */,
+				FD103D7F0B2839E52294B3CF /* MediaStorageService.swift */,
+				924ADB3541A80B51BABBCEDF /* NotificationPresentationDelegate.swift */,
+				AA3428CD51F46F67A7524ED6 /* NotificationScheduler.swift */,
+				A2DA96EE6E5786AE216B6840 /* OrderPaymentLedgerService.swift */,
+				E8B3DA7501F0F848CAA36EF1 /* PasswordCrypto.swift */,
+				D37D1FF1A9A3B9C6ABAAE529 /* PaymentLedgerService.swift */,
+				CD4E27EC82BE74CB1392ABB3 /* ScheduleSyncDocument.swift */,
+				E304B9492761D8513E67C56C /* SeedService.swift */,
+				9895FDCF70EAB1F2DF2BC095 /* TestDataService.swift */,
+				31312B759B5323BA5F5A41F4 /* VoiceIntakeModels.swift */,
+				AED5DBFD2ADB7825D396C65A /* VoiceIntakeRecorder.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		919391EAD984C8D9300809B3 = {
+			isa = PBXGroup;
+			children = (
+				ECABB00BC92A614AE5BCCFF4 /* SoulTower */,
+				0B4DB5B322A6287C6EE48E20 /* SoulTowerMacUITests */,
+				D36FE07B76B74A237F64E0B1 /* SoulTowerTests */,
+				23897068A81AF3092CA92CD2 /* SoulTowerUITests */,
+				9ADE15B25836C2EB6D26862A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9ADE15B25836C2EB6D26862A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				65617B30E3E567B56B4D1A8E /* SoulTower.app */,
+				F7C69A0EF7AF51E055A4FCCA /* SoulTowerMacUITests.xctest */,
+				47894E394D0E91B36536B03B /* SoulTowerTests.xctest */,
+				9E9862EB8F535E3A56A1FE80 /* SoulTowerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B0B91EAB6FD2760627E0DC5C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				FD2EF91E084667F15B424989 /* AppModelContainer.swift */,
+				2A742DA1A40E4EE14C832E10 /* SoulTowerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C3648F363479FC9931515512 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				D7E47FDA6A27D0A02D0FA4BC /* BrandTheme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		D36FE07B76B74A237F64E0B1 /* SoulTowerTests */ = {
+			isa = PBXGroup;
+			children = (
+				D795B7D6CEFFC9A9D68005AE /* BusinessRulesTests.swift */,
+			);
+			path = SoulTowerTests;
+			sourceTree = "<group>";
+		};
+		ECABB00BC92A614AE5BCCFF4 /* SoulTower */ = {
+			isa = PBXGroup;
+			children = (
+				B0B91EAB6FD2760627E0DC5C /* App */,
+				C3648F363479FC9931515512 /* Design */,
+				39BE3308922FDA3DF53F033B /* Models */,
+				44DA610CA4A66E0D87B8C4EF /* Services */,
+				24DC38402612FD8FB1E25EA5 /* Views */,
+			);
+			path = SoulTower;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3AC092C8E4AFFBFAF6479C59 /* SoulTowerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2FA5EF8A4F84E2283F83438 /* Build configuration list for PBXNativeTarget "SoulTowerUITests" */;
+			buildPhases = (
+				E31C3178025519FF72F8A1F0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA5CD9DC91B2FEFDEE865296 /* PBXTargetDependency */,
+			);
+			name = SoulTowerUITests;
+			packageProductDependencies = (
+			);
+			productName = SoulTowerUITests;
+			productReference = 9E9862EB8F535E3A56A1FE80 /* SoulTowerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		90008B152A1DDF4AA2F168EC /* SoulTowerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CAA888E4EDFB0EB5E21A4D8 /* Build configuration list for PBXNativeTarget "SoulTowerTests" */;
+			buildPhases = (
+				379567E6DF80C56E3D037417 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B1231EF89CC83E12889DA618 /* PBXTargetDependency */,
+			);
+			name = SoulTowerTests;
+			packageProductDependencies = (
+			);
+			productName = SoulTowerTests;
+			productReference = 47894E394D0E91B36536B03B /* SoulTowerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DC639FA14529A8B5D8E3AA93 /* SoulTowerMacUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0CD1268ECE5B548CBB0167E /* Build configuration list for PBXNativeTarget "SoulTowerMacUITests" */;
+			buildPhases = (
+				3E3FAE222258CCF3896D4F54 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1526DDE2C2BB048E90DBF9C7 /* PBXTargetDependency */,
+			);
+			name = SoulTowerMacUITests;
+			packageProductDependencies = (
+			);
+			productName = SoulTowerMacUITests;
+			productReference = F7C69A0EF7AF51E055A4FCCA /* SoulTowerMacUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F992498230DD259E2770D15B /* SoulTower */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D898C95787F4E03609E32593 /* Build configuration list for PBXNativeTarget "SoulTower" */;
+			buildPhases = (
+				6BE032915C52DBF2A09FDCC0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SoulTower;
+			packageProductDependencies = (
+			);
+			productName = SoulTower;
+			productReference = 65617B30E3E567B56B4D1A8E /* SoulTower.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C19514AE816DFCE1F553BC40 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					3AC092C8E4AFFBFAF6479C59 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = F992498230DD259E2770D15B;
+					};
+					90008B152A1DDF4AA2F168EC = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					DC639FA14529A8B5D8E3AA93 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = F992498230DD259E2770D15B;
+					};
+					F992498230DD259E2770D15B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D43A8E7D3C5A6C12291BB158 /* Build configuration list for PBXProject "SoulTower" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 919391EAD984C8D9300809B3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9ADE15B25836C2EB6D26862A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F992498230DD259E2770D15B /* SoulTower */,
+				90008B152A1DDF4AA2F168EC /* SoulTowerTests */,
+				3AC092C8E4AFFBFAF6479C59 /* SoulTowerUITests */,
+				DC639FA14529A8B5D8E3AA93 /* SoulTowerMacUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		379567E6DF80C56E3D037417 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E728BACDA87D6D8A0C309585 /* BusinessRulesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E3FAE222258CCF3896D4F54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8E6CAB6AE5BF8E3DF7EEFDB /* BusinessFlowMacUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BE032915C52DBF2A09FDCC0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1AE1206B3BC85F3E4A32CF5C /* AIWorkspaceView.swift in Sources */,
+				ED10A58251DD8A5074F54307 /* AppLockView.swift in Sources */,
+				765B94BF7F28482C79C03D12 /* AppMigrationService.swift in Sources */,
+				B684078FF0923152F0B59EC2 /* AppModelContainer.swift in Sources */,
+				62328D4CC8E2FAB45C52CD08 /* AppSecurityManager.swift in Sources */,
+				79181B7E04FC9F458315807D /* AppState.swift in Sources */,
+				4BCC65A786469C588A08BD9F /* Appointment.swift in Sources */,
+				6BD61FE5863BF222CE644279 /* AudioSelfTestRecorder.swift in Sources */,
+				3C65CD372A67AA07641BE2E2 /* BackupModels.swift in Sources */,
+				6D4971A8DB3245B24C59233B /* BackupService.swift in Sources */,
+				703E64CBA13A4087D3E2CAD1 /* BrandTheme.swift in Sources */,
+				17B45DF9479DECA8C36DCFE5 /* BusinessAnalytics.swift in Sources */,
+				D5801D26818FAEBA6C8B431C /* BusinessReportDocument.swift in Sources */,
+				EC1A7311FD0E32058031AAF4 /* BusinessView.swift in Sources */,
+				10ACEEE64A78595414F7E8B8 /* Client.swift in Sources */,
+				332F23F373548A70CD3B8EDF /* ClientsView.swift in Sources */,
+				83B59D2CE3871458B38264D5 /* ConsentRecord.swift in Sources */,
+				40ACF9D5E35C8AB76E415733 /* ConsultationActivity.swift in Sources */,
+				1A592F633A3169EBADB49571 /* ConsultationRecord.swift in Sources */,
+				FE1C80BFFB0E6DBA62DE9073 /* ConsultationSummaryRevision.swift in Sources */,
+				EC830F9B53A57190B03E28CD /* ConsultationWorkflowService.swift in Sources */,
+				D1F255B78EE4CD44EA2B1503 /* DashboardView.swift in Sources */,
+				E2986F01778C38C14CCEBA5C /* DefaultBusinessRules.swift in Sources */,
+				7B60639AF3EE9052B848D505 /* DomainEnums.swift in Sources */,
+				40ED81D2C34B25820CB77672 /* EntitlementRedemption.swift in Sources */,
+				E48D76166FCEAACD7301BA9F /* KeychainStore.swift in Sources */,
+				90E9E0DF61FDE297D106EC42 /* LocalAIModelPolicy.swift in Sources */,
+				A77E46278A96E1023D19FC1B /* LocalAIService.swift in Sources */,
+				B27800A52D29CE4E8C094702 /* LocalAudioTranscriptionService.swift in Sources */,
+				2E76330C1DC5B18437D75BA3 /* MediaAsset.swift in Sources */,
+				D89D9C690C19F4ABC35820CC /* MediaStorageService.swift in Sources */,
+				C972C92BB77C08BC87E18E54 /* NotificationPresentationDelegate.swift in Sources */,
+				E216E63737B0B7D4BF42A5A8 /* NotificationScheduler.swift in Sources */,
+				3629D81EF8D99AE4B14FF83A /* OrderPaymentLedgerService.swift in Sources */,
+				A62EAE56F031C3AFEF60425F /* OrderPaymentTransaction.swift in Sources */,
+				ADAB437773539D3E2B2BACD0 /* PasswordCrypto.swift in Sources */,
+				8E737C4B8FA0B6973D6C9499 /* PaymentLedgerService.swift in Sources */,
+				9D90FCD78B33BDCBD84F5316 /* PaymentTransaction.swift in Sources */,
+				EA370EFD21DC6422A849D8E7 /* PaymentTransactionEditorView.swift in Sources */,
+				7DB97720F01CA0B1291C6101 /* RecordsView.swift in Sources */,
+				DDA0C02944D4EE850AA6ED9B /* RootView.swift in Sources */,
+				724ABEA11F40AFBDA869A42D /* SafetyCenterView.swift in Sources */,
+				6386685069967823A96FCF7F /* ScheduleSyncDocument.swift in Sources */,
+				8348D4A6FF35DB3B95567C97 /* ScheduleView.swift in Sources */,
+				33CD0FA22BEC5AD0E04A2011 /* SeedService.swift in Sources */,
+				D4FE4A604E000F38FCBA1D6C /* ServiceItem.swift in Sources */,
+				F62119E6F9D813E661D4D66B /* ServiceOrder.swift in Sources */,
+				FDC665E46691663EBB6149E2 /* ServiceOrderChange.swift in Sources */,
+				EB8544B568A1329E742779C8 /* ServiceOrderDetailView.swift in Sources */,
+				E6A2D0431718E54E7D135D4A /* ServiceOrdersView.swift in Sources */,
+				41B686991D803DA0B1E9760A /* ServicesView.swift in Sources */,
+				F26FF88CAD3D38E9A21F03A2 /* SettingsView.swift in Sources */,
+				CAC5D7C7EA6E9F1DC1A12C10 /* SoulTowerApp.swift in Sources */,
+				9369C61602D14D98C1A5A9E0 /* TestDataService.swift in Sources */,
+				E8F45A675D2DA08CAC570E74 /* VoiceIntakeModels.swift in Sources */,
+				6A104FA7711BD3220426ACFB /* VoiceIntakeRecorder.swift in Sources */,
+				F37F82EE7DF886A98FC3301B /* VoiceIntakeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E31C3178025519FF72F8A1F0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48E64DBA06E77E714D851A21 /* BusinessFlowUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1526DDE2C2BB048E90DBF9C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F992498230DD259E2770D15B /* SoulTower */;
+			targetProxy = A6E8F4DCC655A22495EFB492 /* PBXContainerItemProxy */;
+		};
+		B1231EF89CC83E12889DA618 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F992498230DD259E2770D15B /* SoulTower */;
+			targetProxy = 845CF9A39A08D2B7DFBDE7C0 /* PBXContainerItemProxy */;
+		};
+		FA5CD9DC91B2FEFDEE865296 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F992498230DD259E2770D15B /* SoulTower */;
+			targetProxy = D263848F40D4F7AA9892F742 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		30B9277E48CF5220360F2DE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SoulTower;
+			};
+			name = Debug;
+		};
+		4F672893151B386C8FDE0E60 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 15;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5A53F3625AF53C04DA21F811 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SoulTower;
+			};
+			name = Release;
+		};
+		633E81DE1453EA8965722819 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.macuitests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = SoulTower;
+			};
+			name = Release;
+		};
+		7744648AF28345FFEE9DF0F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SoulTower/Resources/SoulTower.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "心塔";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 解锁心塔，保护本机客户资料。";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "心塔仅在你主动启用时连接本地设备上的 AI 服务，不会自动上传客户资料。";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "使用麦克风在本机录入信息或执行 10 秒设备自检；测试录音不会保存到客户资料。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "使用本机离线语音识别把口述或已导入录音转成可编辑文字，不上传云端识别。";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.app;
+				PRODUCT_MODULE_NAME = SoulTower;
+				PRODUCT_NAME = "心塔";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9147366406CD162F4D7D569A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 15;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B7520975486414D3D99242A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SoulTower/Resources/SoulTower.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "心塔";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "使用 Face ID 解锁心塔，保护本机客户资料。";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "心塔仅在你主动启用时连接本地设备上的 AI 服务，不会自动上传客户资料。";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "使用麦克风在本机录入信息或执行 10 秒设备自检；测试录音不会保存到客户资料。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "使用本机离线语音识别把口述或已导入录音转成可编辑文字，不上传云端识别。";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.app;
+				PRODUCT_MODULE_NAME = SoulTower;
+				PRODUCT_NAME = "心塔";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B97514E71042DE3D187754D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.macuitests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = SoulTower;
+			};
+			name = Debug;
+		};
+		D48E06241BB4D84333099DE7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/心塔.app/Contents/MacOS/心塔";
+			};
+			name = Release;
+		};
+		D9E159E0FCB494588D2D0FAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xuyuchen.soultower.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/心塔.app/Contents/MacOS/心塔";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9CAA888E4EDFB0EB5E21A4D8 /* Build configuration list for PBXNativeTarget "SoulTowerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9E159E0FCB494588D2D0FAC /* Debug */,
+				D48E06241BB4D84333099DE7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A2FA5EF8A4F84E2283F83438 /* Build configuration list for PBXNativeTarget "SoulTowerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				30B9277E48CF5220360F2DE1 /* Debug */,
+				5A53F3625AF53C04DA21F811 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D0CD1268ECE5B548CBB0167E /* Build configuration list for PBXNativeTarget "SoulTowerMacUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B97514E71042DE3D187754D4 /* Debug */,
+				633E81DE1453EA8965722819 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D43A8E7D3C5A6C12291BB158 /* Build configuration list for PBXProject "SoulTower" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9147366406CD162F4D7D569A /* Debug */,
+				4F672893151B386C8FDE0E60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D898C95787F4E03609E32593 /* Build configuration list for PBXNativeTarget "SoulTower" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7520975486414D3D99242A3 /* Debug */,
+				7744648AF28345FFEE9DF0F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C19514AE816DFCE1F553BC40 /* Project object */;
+}

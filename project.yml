@@ -1,0 +1,115 @@
+name: SoulTower
+options:
+  bundleIdPrefix: com.xuyuchen.soultower
+  deploymentTarget:
+    iOS: "17.0"
+    macOS: "14.0"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+  xcodeVersion: "26.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CURRENT_PROJECT_VERSION: 15
+    MARKETING_VERSION: 0.8.0
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+
+targets:
+  SoulTower:
+    type: application
+    platform: auto
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: SoulTower
+        excludes:
+          - Resources/SoulTower.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xuyuchen.soultower.app
+        PRODUCT_NAME: 心塔
+        PRODUCT_MODULE_NAME: SoulTower
+        INFOPLIST_KEY_CFBundleDisplayName: 心塔
+        INFOPLIST_KEY_NSFaceIDUsageDescription: 使用 Face ID 解锁心塔，保护本机客户资料。
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: 使用麦克风在本机录入信息或执行 10 秒设备自检；测试录音不会保存到客户资料。
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: 使用本机离线语音识别把口述或已导入录音转成可编辑文字，不上传云端识别。
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.business
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: 心塔仅在你主动启用时连接本地设备上的 AI 服务，不会自动上传客户资料。
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        CODE_SIGN_ENTITLEMENTS: SoulTower/Resources/SoulTower.entitlements
+    entitlements:
+      path: SoulTower/Resources/SoulTower.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.network.client: true
+        com.apple.security.device.audio-input: true
+    scheme:
+      testTargets:
+        - SoulTowerTests
+      gatherCoverageData: true
+
+  SoulTowerTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: SoulTowerTests
+    dependencies:
+      - target: SoulTower
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xuyuchen.soultower.tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGNING_ALLOWED: NO
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/心塔.app/Contents/MacOS/心塔"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  SoulTowerUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: SoulTowerUITests
+    dependencies:
+      - target: SoulTower
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xuyuchen.soultower.uitests
+        GENERATE_INFOPLIST_FILE: YES
+
+  SoulTowerMacUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: SoulTowerMacUITests
+    dependencies:
+      - target: SoulTower
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xuyuchen.soultower.macuitests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  SoulTower-iOS-UI:
+    build:
+      targets:
+        SoulTower: all
+        SoulTowerUITests: [test]
+    test:
+      targets:
+        - SoulTowerUITests
+  SoulTower-macOS-UI:
+    build:
+      targets:
+        SoulTower: all
+        SoulTowerMacUITests: [test]
+    test:
+      targets:
+        - SoulTowerMacUITests
