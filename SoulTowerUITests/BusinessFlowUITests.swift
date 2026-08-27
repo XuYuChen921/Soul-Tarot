@@ -156,4 +156,27 @@ final class BusinessFlowUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    func testPhoneCanOpenBrandGrowthFromMore() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.tabBars.buttons["更多"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["更多"].tap()
+        let brandEntry = app.staticTexts["品牌增长"].firstMatch
+        XCTAssertTrue(brandEntry.waitForExistence(timeout: 5))
+        brandEntry.tap()
+
+        XCTAssertTrue(app.navigationBars["品牌增长"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["品牌增长工作台"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["新建选题"].waitForExistence(timeout: 5))
+        app.buttons["新建选题"].tap()
+        XCTAssertTrue(app.staticTexts["M1 来源边界"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "iPhone 品牌增长新建选题"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

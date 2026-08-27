@@ -117,6 +117,36 @@ actor LocalAIService {
         #endif
     }
 
+    func generateStructuredJSON(prompt: String, baseURL: String, model: String) async throws -> String {
+        #if os(macOS)
+        let clean = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty else { throw LocalAIError.emptyTranscript }
+        let base = try validatedBaseURL(baseURL)
+        let url = base.appendingPathComponent("api/generate")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 600
+        request.httpBody = try JSONEncoder().encode(StructuredGenerateRequest(
+            model: model,
+            prompt: "/no_think\n" + clean,
+            stream: false,
+            think: false,
+            format: "json",
+            options: GenerateOptions(temperature: 0.2, numCtx: 4_096, numPredict: 700)
+        ))
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validateHTTP(response)
+        let result = try JSONDecoder().decode(GenerateResponse.self, from: data)
+        let output = result.response.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !output.isEmpty else { throw LocalAIError.invalidResponse }
+        return output
+        #else
+        throw LocalAIError.macOnly
+        #endif
+    }
+
     func structureVoiceIntake(
         transcript: String,
         serviceNames: [String],

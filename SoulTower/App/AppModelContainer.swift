@@ -26,7 +26,15 @@ enum AppModelContainer {
             EntitlementRedemption.self,
             ServiceOrderChange.self,
             ConsultationActivity.self,
-            ConsultationSummaryRevision.self
+            ConsultationSummaryRevision.self,
+            BrandProfile.self,
+            BrandContentTopic.self,
+            BrandDraft.self,
+            BrandDraftRevision.self,
+            BrandPublishRecord.self,
+            BrandAsset.self,
+            BrandMetricSnapshot.self,
+            BrandWeeklyReview.self
         ])
         let configuration = ModelConfiguration(
             "SoulTower",

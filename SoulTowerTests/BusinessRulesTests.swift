@@ -1155,4 +1155,113 @@ final class BusinessRulesTests: XCTestCase {
         XCTAssertEqual(grounded.localAIConsent, .accepted)
         XCTAssertEqual(grounded.retentionConsent, .accepted)
     }
+
+    func testBrandM1RejectsCustomerAndHistoricalSources() {
+        XCTAssertNoThrow(try BrandGrowthWorkflowService.validateM1Source(.personalOpinion))
+        XCTAssertNoThrow(try BrandGrowthWorkflowService.validateM1Source(.publicMaterial))
+        XCTAssertNoThrow(try BrandGrowthWorkflowService.validateM1Source(.brandMaterial))
+        XCTAssertThrowsError(try BrandGrowthWorkflowService.validateM1Source(.customerTheme))
+        XCTAssertThrowsError(try BrandGrowthWorkflowService.validateM1Source(.historicalReuse))
+    }
+
+    func testBrandApprovalIsIndependentAndEditInvalidatesIt() throws {
+        let profile = BrandProfile.defaultProfile()
+        let topicID = UUID()
+        let wechat = BrandDraft(topicID: topicID, channel: .wechatMoments, title: "关系里的边界", content: "先看见自己的感受，再讨论可执行的选择。")
+        let xiaohongshu = BrandDraft(topicID: topicID, channel: .xiaohongshu, title: "三个边界练习", content: "把事实、感受和请求分开记录。")
+        let approvedAt = Date(timeIntervalSince1970: 1_787_000_000)
+
+        try BrandGrowthWorkflowService.approve(wechat, profile: profile, by: "测试审核人", now: approvedAt)
+
+        XCTAssertTrue(wechat.isApproved)
+        XCTAssertEqual(wechat.approvedAt, approvedAt)
+        XCTAssertFalse(xiaohongshu.isApproved)
+
+        wechat.markEdited(approvedAt.addingTimeInterval(60))
+        XCTAssertFalse(wechat.isApproved)
+        XCTAssertNil(wechat.approvedAt)
+        XCTAssertTrue(wechat.riskWarnings.contains("已修改草稿，需重新审批"))
+    }
+
+    func testBrandRiskBlocksApproval() {
+        let profile = BrandProfile.defaultProfile()
+        let draft = BrandDraft(
+            topicID: UUID(),
+            channel: .wechatMoments,
+            title: "保证有效",
+            content: "联系手机号 13800138000，一定会解决问题。"
+        )
+
+        XCTAssertThrowsError(try BrandGrowthWorkflowService.approve(draft, profile: profile, by: "测试审核人"))
+        XCTAssertFalse(draft.isApproved)
+        let risks = BrandGrowthWorkflowService.approvalRisks(for: draft, profile: profile)
+        XCTAssertTrue(risks.contains(where: { $0.contains("手机号") }))
+        XCTAssertTrue(risks.contains(where: { $0.contains("确定性承诺") }))
+    }
+
+    func testBrandPublishRequiresApprovalAndKeepsSnapshot() throws {
+        let profile = BrandProfile.defaultProfile()
+        let draft = BrandDraft(
+            topicID: UUID(),
+            channel: .xiaohongshu,
+            title: "选择困难时先问什么",
+            opening: "先暂停一下。",
+            content: "把可控和不可控分别写下来。",
+            actionPrompt: "收藏后慢慢练习。"
+        )
+        XCTAssertThrowsError(try BrandGrowthWorkflowService.makePublishRecord(from: draft, plannedAt: .now))
+
+        try BrandGrowthWorkflowService.approve(draft, profile: profile, by: "测试审核人")
+        let record = try BrandGrowthWorkflowService.makePublishRecord(from: draft, plannedAt: .now)
+        let originalSnapshot = record.snapshotContent
+        draft.content = "后续编辑，不应改写发布快照。"
+
+        XCTAssertEqual(record.snapshotTitle, "选择困难时先问什么")
+        XCTAssertTrue(originalSnapshot.contains("把可控和不可控分别写下来"))
+        XCTAssertEqual(record.snapshotContent, originalSnapshot)
+        XCTAssertTrue(record.publishedAsApproved)
+    }
+
+    func testBrandDraftRevisionCopiesPreviousVersion() {
+        let draft = BrandDraft(topicID: UUID(), channel: .wechatMoments, title: "旧标题", content: "旧正文", version: 3)
+        let revision = BrandDraftRevision(draft: draft, savedAt: Date(timeIntervalSince1970: 123))
+        draft.title = "新标题"
+        draft.content = "新正文"
+
+        XCTAssertEqual(revision.version, 3)
+        XCTAssertEqual(revision.title, "旧标题")
+        XCTAssertEqual(revision.content, "旧正文")
+        XCTAssertEqual(revision.savedAt, Date(timeIntervalSince1970: 123))
+    }
+
+    func testBrandLocalAIGeneratesStructuredDraftWhenIntegrationEnabled() async throws {
+        guard ProcessInfo.processInfo.environment["RUN_LOCAL_AI_INTEGRATION"] == "1" else {
+            throw XCTSkip("仅在显式启用本机 AI 集成检查时运行。")
+        }
+        let profile = BrandProfile.defaultProfile()
+        let topic = BrandContentTopic(
+            profileID: profile.id,
+            title: "选择困难时先区分什么",
+            rawIdea: "先区分事实、感受和可控行动，不替别人做决定。",
+            targetAudience: "正在做重要选择的人",
+            pillar: "决策与自我认识",
+            goal: .trust,
+            sourceType: .personalOpinion,
+            sensitivity: "公开内容",
+            customerReference: "",
+            actionHint: "保存一份练习清单",
+            priority: 2
+        )
+
+        let result = try await BrandGrowthAIService.generate(
+            channel: .wechatMoments,
+            topic: topic,
+            profile: profile,
+            baseURL: "http://127.0.0.1:11434",
+            modelName: "qwen3.5:9b"
+        )
+
+        XCTAssertFalse(result.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        XCTAssertFalse(result.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
 }

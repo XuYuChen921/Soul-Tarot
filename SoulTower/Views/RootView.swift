@@ -7,6 +7,7 @@ enum AppSection: String, CaseIterable, Identifiable {
     case records = "咨询资料"
     case ai = "AI 整理"
     case business = "经营总览"
+    case brandGrowth = "品牌增长"
     case orders = "客户订单"
     case services = "产品与服务"
     case safety = "安全中心"
@@ -22,6 +23,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         case .records: return "folder"
         case .ai: return "wand.and.stars"
         case .business: return "chart.bar.xaxis"
+        case .brandGrowth: return "sparkles"
         case .orders: return "shippingbox"
         case .services: return "square.grid.2x2"
         case .safety: return "lock.shield"
@@ -118,6 +120,7 @@ struct RootView: View {
         case .records: RecordsView()
         case .ai: AIWorkspaceView()
         case .business: BusinessView()
+        case .brandGrowth: BrandGrowthView()
         case .orders: ServiceOrdersView()
         case .services: ServicesView()
         case .safety: SafetyCenterView()
@@ -155,6 +158,9 @@ private struct PhoneMoreView: View {
                 }
                 NavigationLink { BusinessView() } label: {
                     Label("经营总览", systemImage: AppSection.business.icon)
+                }
+                NavigationLink { BrandGrowthView() } label: {
+                    Label("品牌增长", systemImage: AppSection.brandGrowth.icon)
                 }
                 NavigationLink { AIWorkspaceView() } label: {
                     Label("AI 整理", systemImage: AppSection.ai.icon)

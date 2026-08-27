@@ -27,6 +27,7 @@ struct SoulTowerApp: App {
                         if AppModelContainer.usesTemporaryTestStore {
                             appState.migrationStatus = "V\(AppMigrationService.currentVersion)，临时界面测试数据"
                             try SeedService.seedServiceCatalogIfNeeded(context: container.mainContext)
+                            try AppMigrationService.backfillBrandDefaults(context: container.mainContext)
                             if ProcessInfo.processInfo.arguments.contains("--ui-testing-v06") {
                                 try SeedService.insertV06UITestData(context: container.mainContext)
                             }

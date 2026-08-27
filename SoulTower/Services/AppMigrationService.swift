@@ -7,7 +7,7 @@ private struct AppMigrationState: Codable {
 }
 
 enum AppMigrationService {
-    static let currentVersion = 7
+    static let currentVersion = 8
 
     @MainActor
     static func run(context: ModelContext) throws -> String {
@@ -53,11 +53,27 @@ enum AppMigrationService {
             state.updatedAt = .now
             completedSteps.append("产品、订单与套餐权益拆分")
         }
+        if state.version < 8 {
+            try backfillBrandDefaults(context: context)
+            state.version = 8
+            state.updatedAt = .now
+            completedSteps.append("品牌增长初始模型接入")
+        }
         if !completedSteps.isEmpty {
             try saveState(state)
             return "已安全升级到 V\(currentVersion)（\(completedSteps.joined(separator: "、"))）"
         }
         return "V\(currentVersion)，已是最新"
+    }
+
+    @MainActor
+    static func backfillBrandDefaults(context: ModelContext) throws {
+        let descriptor = FetchDescriptor<BrandProfile>()
+        let count = try context.fetchCount(descriptor)
+        if count == 0 {
+            context.insert(BrandProfile.defaultProfile())
+            try context.save()
+        }
     }
 
     @MainActor
