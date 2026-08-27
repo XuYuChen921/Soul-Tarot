@@ -7,7 +7,7 @@ private struct AppMigrationState: Codable {
 }
 
 enum AppMigrationService {
-    static let currentVersion = 9
+    static let currentVersion = 10
 
     @MainActor
     static func run(context: ModelContext) throws -> String {
@@ -63,6 +63,11 @@ enum AppMigrationService {
             state.version = 9
             state.updatedAt = .now
             completedSteps.append("品牌数据、归因与周复盘接入")
+        }
+        if state.version < 10 {
+            state.version = 10
+            state.updatedAt = .now
+            completedSteps.append("品牌素材、匿名授权与撤回闭环接入")
         }
         if !completedSteps.isEmpty {
             try saveState(state)
@@ -173,6 +178,7 @@ enum AppMigrationService {
             case .photo: record.textSnapshot = DefaultBusinessRules.photoConsentNotice
             case .localAI: record.textSnapshot = DefaultBusinessRules.localAIConsentNotice
             case .longTermRetention: record.textSnapshot = DefaultBusinessRules.retentionNotice
+            case .anonymousContentUse: record.textSnapshot = "仅允许在已保存范围、平台和期限内使用完成去身份化复核的客户内容；客户可随时撤回。"
             }
             changed = true
         }

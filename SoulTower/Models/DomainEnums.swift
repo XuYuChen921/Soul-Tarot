@@ -133,6 +133,7 @@ enum ConsentType: String, CaseIterable, Codable, Identifiable {
     case localAI = "本地 AI 处理"
     case longTermRetention = "长期保存"
     case photo = "牌阵照片"
+    case anonymousContentUse = "匿名化内容使用"
 
     var id: String { rawValue }
 }

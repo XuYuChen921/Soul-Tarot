@@ -172,7 +172,7 @@ final class BusinessFlowUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["品牌增长工作台"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["新建选题"].waitForExistence(timeout: 5))
         app.buttons["新建选题"].tap()
-        XCTAssertTrue(app.staticTexts["M1 来源边界"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["来源边界"].waitForExistence(timeout: 5))
 
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         attachment.name = "iPhone 品牌增长新建选题"
@@ -208,6 +208,31 @@ final class BusinessFlowUITests: XCTestCase {
 
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         attachment.name = "iPhone 品牌增长 M2 周复盘"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testPhoneBrandM3CanViewConsentAssetsAndTasks() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launchArguments.append("--ui-testing-brand-m3")
+        app.launch()
+
+        XCTAssertTrue(app.tabBars.buttons["更多"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["更多"].tap()
+        app.staticTexts["品牌增长"].firstMatch.tap()
+
+        let pagePicker = app.descendants(matching: .any)["brand-page-picker"]
+        XCTAssertTrue(pagePicker.waitForExistence(timeout: 5))
+        pagePicker.tap()
+        XCTAssertTrue(app.buttons["素材授权"].waitForExistence(timeout: 5))
+        app.buttons["素材授权"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m3-consent-list"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m3-asset-list"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m3-task-list"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "iPhone 品牌增长 M3 素材授权"
         attachment.lifetime = .keepAlways
         add(attachment)
     }

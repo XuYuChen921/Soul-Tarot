@@ -1580,4 +1580,273 @@ final class BusinessRulesTests: XCTestCase {
         XCTAssertTrue(review.facts.contains("¥666"), review.facts)
         XCTAssertEqual(review.usedSnapshotIDs, [snapshot.id])
     }
+
+    func testBrandM3RejectsCustomerMaterialWithoutIndependentConsentAndDeidentification() {
+        let clientID = UUID()
+        let asset = BrandAsset(
+            name: "未授权客户素材",
+            kind: .document,
+            source: "测试",
+            owner: "测试客户",
+            permission: .usable,
+            allowedChannelsText: "微信朋友圈，小红书",
+            category: .customerRelated,
+            clientID: clientID,
+            deidentifiedSummary: "一位来访者正在练习表达边界。"
+        )
+
+        XCTAssertThrowsError(try BrandAssetWorkflowService.validateTopic(
+            source: .customerTheme,
+            linkedAssetIDs: [asset.id],
+            assets: [asset],
+            consents: []
+        )) { error in
+            XCTAssertEqual(error as? BrandAssetWorkflowError, .consentRequired)
+        }
+    }
+
+    func testBrandM3AllowsOnlyAuthorizedDoubleReviewedAnonymousSummary() throws {
+        let clientID = UUID()
+        let consent = ConsentRecord(
+            clientID: clientID,
+            type: .anonymousContentUse,
+            textVersion: "ANON-TEST-1",
+            textSnapshot: "仅用于匿名共性主题",
+            accepted: true,
+            allowedChannelsText: "微信朋友圈，小红书",
+            allowedFormatsText: "图文",
+            expiresAt: Date.now.addingTimeInterval(86_400)
+        )
+        let asset = BrandAsset(
+            name: "匿名边界主题",
+            kind: .document,
+            source: "客户主动反馈",
+            owner: "测试客户",
+            permission: .usable,
+            allowedChannelsText: "微信朋友圈，小红书",
+            category: .customerRelated,
+            clientID: clientID,
+            consentID: consent.id,
+            deidentifiedSummary: "有人在关系中反复退让，后来开始区分事实、感受和请求。",
+            directIdentifiersRemoved: true,
+            indirectIdentifiersReviewed: true,
+            secondReviewCompleted: true,
+            secondReviewer: "测试复核人",
+            reviewedAt: .now,
+            allowedFormatsText: "图文"
+        )
+
+        XCTAssertNoThrow(try BrandAssetWorkflowService.validateTopic(
+            source: .customerTheme,
+            linkedAssetIDs: [asset.id],
+            assets: [asset],
+            consents: [consent]
+        ))
+        XCTAssertThrowsError(try BrandAssetWorkflowService.validate(
+            asset: asset,
+            consent: consent,
+            channel: .xiaohongshu,
+            now: Date.now.addingTimeInterval(172_800)
+        ))
+    }
+
+    func testBrandM3RejectsIdentityCluesInAnonymousSummary() {
+        let risks = BrandAssetWorkflowService.identityRisks(
+            in: "客户微信号：wayne_test_01，手机号 13800138000，于 2026-08-27 到访。"
+        )
+        XCTAssertTrue(risks.contains("手机号"))
+        XCTAssertTrue(risks.contains("直接识别字段"))
+        XCTAssertTrue(risks.contains("精确日期"))
+    }
+
+    func testBrandM3WithdrawalImmediatelyBlocksDraftAndCreatesAuditTasks() {
+        let clientID = UUID()
+        let consent = ConsentRecord(
+            clientID: clientID,
+            type: .anonymousContentUse,
+            textVersion: "ANON-TEST-2",
+            textSnapshot: "测试授权",
+            accepted: true,
+            allowedChannelsText: "微信朋友圈，小红书"
+        )
+        let asset = BrandAsset(
+            name: "待撤回素材",
+            kind: .document,
+            source: "测试",
+            owner: "测试客户",
+            permission: .usable,
+            allowedChannelsText: "微信朋友圈，小红书",
+            category: .customerRelated,
+            clientID: clientID,
+            consentID: consent.id,
+            relativePath: "test.txt",
+            deidentifiedSummary: "匿名主题",
+            directIdentifiersRemoved: true,
+            indirectIdentifiersReviewed: true,
+            secondReviewCompleted: true,
+            secondReviewer: "测试复核人",
+            reviewedAt: .now
+        )
+        let topic = BrandContentTopic(
+            profileID: UUID(), title: "测试选题", rawIdea: "匿名主题", targetAudience: "测试",
+            pillar: "边界", goal: .trust, sourceType: .customerTheme,
+            sensitivity: "客户匿名主题", customerReference: "已通过门槛",
+            linkedAssetIDsText: asset.id.uuidString, actionHint: "", priority: 2
+        )
+        let unpublished = BrandDraft(
+            topicID: topic.id, channel: .wechatMoments, title: "未发布", content: "测试正文",
+            status: .approved, linkedAssetIDsText: asset.id.uuidString
+        )
+        unpublished.approvedAt = .now
+        let published = BrandDraft(
+            topicID: topic.id, channel: .xiaohongshu, title: "已发布", content: "测试正文",
+            status: .approved, linkedAssetIDsText: asset.id.uuidString
+        )
+        published.approvedAt = .now
+        let record = BrandPublishRecord(
+            topicID: topic.id, draftID: published.id, channel: .xiaohongshu,
+            publishedAt: .now, snapshotTitle: "已发布"
+        )
+
+        let result = BrandAssetWorkflowService.withdraw(
+            consent: consent,
+            assets: [asset],
+            topics: [topic],
+            drafts: [unpublished, published],
+            publishRecords: [record],
+            method: "测试撤回"
+        )
+
+        XCTAssertNotNil(consent.withdrawnAt)
+        XCTAssertEqual(asset.permission, .withdrawn)
+        XCTAssertEqual(unpublished.status, .deprecated)
+        XCTAssertEqual(published.status, .deprecated)
+        XCTAssertTrue(topic.isArchived)
+        XCTAssertEqual(result.events.map(\.action), [.withdrawn])
+        XCTAssertTrue(result.tasks.contains { $0.type == .discardDraft })
+        XCTAssertTrue(result.tasks.contains { $0.type == .reviewPublishedContent })
+        XCTAssertTrue(result.tasks.contains { $0.type == .removeLocalFile })
+        XCTAssertThrowsError(try BrandGrowthWorkflowService.approve(
+            unpublished,
+            profile: BrandProfile.defaultProfile(),
+            assets: [asset],
+            consents: [consent],
+            by: "测试审核人"
+        ))
+    }
+
+    @MainActor
+    func testBrandM3BackupRestoresAllBrandAuthorizationStateAndDeletesUnbackedRows() throws {
+        let schema = Schema([
+            Client.self, ServiceItem.self, Appointment.self, ConsentRecord.self, ConsultationRecord.self,
+            MediaAsset.self, PaymentTransaction.self, ServiceOrder.self, OrderPaymentTransaction.self,
+            EntitlementRedemption.self, ServiceOrderChange.self, ConsultationActivity.self,
+            ConsultationSummaryRevision.self, BrandProfile.self, BrandContentTopic.self, BrandDraft.self,
+            BrandDraftRevision.self, BrandPublishRecord.self, BrandAsset.self, BrandMetricSnapshot.self,
+            BrandWeeklyReview.self, BrandMarketingTouchpoint.self, BrandAssetAuditEvent.self,
+            BrandAssetUsage.self, BrandAssetActionTask.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let client = Client(clientCode: "C-M3-BACKUP", displayName: "备份测试客户")
+        let consent = ConsentRecord(
+            clientID: client.id, type: .anonymousContentUse, textVersion: "ANON-BACKUP-1",
+            textSnapshot: "备份授权文本", accepted: true, withdrawnAt: .now,
+            permissionScope: "匿名共性主题", allowedChannelsText: "微信朋友圈",
+            allowedFormatsText: "图文", expiresAt: .now.addingTimeInterval(86_400),
+            withdrawalMethod: "测试撤回"
+        )
+        let profile = BrandProfile.defaultProfile()
+        let asset = BrandAsset(
+            name: "备份匿名素材", kind: .document, source: "测试", owner: "测试客户",
+            permission: .withdrawn, allowedChannelsText: "微信朋友圈", revokedAt: .now,
+            category: .customerRelated, clientID: client.id, consentID: consent.id,
+            deidentifiedSummary: "已去身份化的测试摘要", directIdentifiersRemoved: true,
+            indirectIdentifiersReviewed: true, secondReviewCompleted: true,
+            secondReviewer: "备份复核人", reviewedAt: .now
+        )
+        let topic = BrandContentTopic(
+            profileID: profile.id, title: "备份选题", rawIdea: "测试摘要", targetAudience: "测试",
+            pillar: "边界", goal: .trust, sourceType: .customerTheme,
+            sensitivity: "授权已撤回", customerReference: "已通过门槛",
+            linkedAssetIDsText: asset.id.uuidString, actionHint: "", priority: 2,
+            status: .archived, isArchived: true
+        )
+        let draft = BrandDraft(
+            topicID: topic.id, channel: .wechatMoments, title: "备份草稿", content: "测试",
+            status: .deprecated, linkedAssetIDsText: asset.id.uuidString
+        )
+        let task = BrandAssetActionTask(
+            assetID: asset.id, draftID: draft.id, type: .discardDraft,
+            detail: "备份待处理任务"
+        )
+        context.insert(client)
+        context.insert(consent)
+        context.insert(profile)
+        context.insert(asset)
+        context.insert(topic)
+        context.insert(draft)
+        context.insert(task)
+        try context.save()
+
+        let snapshot = try BackupService.captureSnapshot(context: context)
+        context.insert(BrandAsset(
+            name: "不应保留的素材", kind: .photo, source: "测试", owner: "测试",
+            permission: .usable
+        ))
+        try context.save()
+        try BackupService.applySnapshotModelsForTesting(snapshot, context: context)
+
+        let restoredAssets = try context.fetch(FetchDescriptor<BrandAsset>())
+        let restoredConsents = try context.fetch(FetchDescriptor<ConsentRecord>())
+        let restoredDrafts = try context.fetch(FetchDescriptor<BrandDraft>())
+        let restoredTasks = try context.fetch(FetchDescriptor<BrandAssetActionTask>())
+        XCTAssertEqual(restoredAssets.count, 1)
+        XCTAssertEqual(restoredAssets.first?.permission, .withdrawn)
+        XCTAssertEqual(restoredAssets.first?.secondReviewer, "备份复核人")
+        XCTAssertEqual(restoredConsents.first?.permissionScope, "匿名共性主题")
+        XCTAssertEqual(restoredConsents.first?.withdrawalMethod, "测试撤回")
+        XCTAssertEqual(restoredDrafts.first?.linkedAssetIDs, [asset.id])
+        XCTAssertEqual(restoredTasks.first?.detail, "备份待处理任务")
+    }
+
+    func testBrandM3EncryptedBackupPreservesBrandAssetFile() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("SoulTowerBrandBackupTest-\(UUID().uuidString)", isDirectory: true)
+        let brandRoot = folder.appendingPathComponent("SourceBrand", isDirectory: true)
+        let destination = folder.appendingPathComponent("Backups", isDirectory: true)
+        try FileManager.default.createDirectory(at: brandRoot, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let asset = BrandAsset(
+            name: "品牌文件备份测试", kind: .document, source: "测试", owner: "心塔",
+            permission: .usable, category: .brandOwned
+        )
+        let relativePath = "\(asset.id.uuidString).txt"
+        let sourceData = Data("brand-backup-content".utf8)
+        try sourceData.write(to: brandRoot.appendingPathComponent(relativePath))
+        asset.relativePath = relativePath
+        asset.originalFilename = "brand.txt"
+        asset.fileSize = Int64(sourceData.count)
+
+        let snapshot = BackupSnapshot(
+            formatVersion: BackupSnapshot.formatVersion,
+            createdAt: .now,
+            appVersion: "TEST",
+            clients: [], services: [], appointments: [], consents: [], records: [], mediaAssets: [],
+            mediaFiles: [], brandAssets: [BackupBrandAsset(asset)], brandFiles: []
+        )
+        let package = try await BackupService.createBackup(
+            snapshot: snapshot,
+            password: "brand-pass-123",
+            destinationFolder: destination,
+            brandAssetRoot: brandRoot
+        )
+        let prepared = try await BackupService.prepareRestore(from: package, password: "brand-pass-123")
+        defer { try? FileManager.default.removeItem(at: prepared.stagedMediaRoot.deletingLastPathComponent()) }
+        let restoredURL = try XCTUnwrap(prepared.stagedBrandAssetRoot).appendingPathComponent(relativePath)
+        XCTAssertEqual(try Data(contentsOf: restoredURL), sourceData)
+        XCTAssertEqual(prepared.snapshot.brandFiles?.count, 1)
+    }
 }

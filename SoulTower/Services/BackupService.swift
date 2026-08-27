@@ -47,7 +47,20 @@ enum BackupService {
             serviceOrderChanges: try context.fetch(FetchDescriptor<ServiceOrderChange>()).map(BackupServiceOrderChange.init),
             consultationActivities: try context.fetch(FetchDescriptor<ConsultationActivity>()).map(BackupConsultationActivity.init),
             consultationSummaryRevisions: try context.fetch(FetchDescriptor<ConsultationSummaryRevision>()).map(BackupConsultationSummaryRevision.init),
-            mediaFiles: []
+            mediaFiles: [],
+            brandProfiles: try context.fetch(FetchDescriptor<BrandProfile>()).map(BackupBrandProfile.init),
+            brandTopics: try context.fetch(FetchDescriptor<BrandContentTopic>()).map(BackupBrandTopic.init),
+            brandDrafts: try context.fetch(FetchDescriptor<BrandDraft>()).map(BackupBrandDraft.init),
+            brandDraftRevisions: try context.fetch(FetchDescriptor<BrandDraftRevision>()).map(BackupBrandDraftRevision.init),
+            brandPublishRecords: try context.fetch(FetchDescriptor<BrandPublishRecord>()).map(BackupBrandPublishRecord.init),
+            brandAssets: try context.fetch(FetchDescriptor<BrandAsset>()).map(BackupBrandAsset.init),
+            brandMetricSnapshots: try context.fetch(FetchDescriptor<BrandMetricSnapshot>()).map(BackupBrandMetricSnapshot.init),
+            brandWeeklyReviews: try context.fetch(FetchDescriptor<BrandWeeklyReview>()).map(BackupBrandWeeklyReview.init),
+            brandMarketingTouchpoints: try context.fetch(FetchDescriptor<BrandMarketingTouchpoint>()).map(BackupBrandMarketingTouchpoint.init),
+            brandAssetAudits: try context.fetch(FetchDescriptor<BrandAssetAuditEvent>()).map(BackupBrandAssetAudit.init),
+            brandAssetUsages: try context.fetch(FetchDescriptor<BrandAssetUsage>()).map(BackupBrandAssetUsage.init),
+            brandAssetTasks: try context.fetch(FetchDescriptor<BrandAssetActionTask>()).map(BackupBrandAssetTask.init),
+            brandFiles: []
         )
     }
 
@@ -55,7 +68,8 @@ enum BackupService {
         snapshot originalSnapshot: BackupSnapshot,
         password: String,
         destinationFolder: URL,
-        mediaRoot: URL? = nil
+        mediaRoot: URL? = nil,
+        brandAssetRoot: URL? = nil
     ) async throws -> URL {
         guard password.count >= 8 else { throw BackupServiceError.passwordTooShort }
         return try await Task.detached(priority: .userInitiated) {
@@ -66,8 +80,10 @@ enum BackupService {
             let filename = "心塔备份-\(formatter.string(from: .now))-\(UUID().uuidString.prefix(6)).xintabackup"
             let package = destinationFolder.appendingPathComponent(filename, isDirectory: true)
             let mediaDirectory = package.appendingPathComponent("media", isDirectory: true)
+            let brandDirectory = package.appendingPathComponent("brand-media", isDirectory: true)
             do {
                 try manager.createDirectory(at: mediaDirectory, withIntermediateDirectories: true)
+                try manager.createDirectory(at: brandDirectory, withIntermediateDirectories: true)
                 let salt = try PasswordCrypto.randomData(count: 16)
                 let key = try PasswordCrypto.deriveKey(password: password, salt: salt)
                 var snapshot = originalSnapshot
@@ -104,6 +120,40 @@ enum BackupService {
                 }
 
                 snapshot.mediaFiles = mediaFiles
+                var brandFiles: [BackupBrandFile] = []
+                for asset in snapshot.brandAssets ?? [] {
+                    guard let relativePath = asset.relativePath, !relativePath.isEmpty else { continue }
+                    let source = try brandAssetRoot?.appendingPathComponent(relativePath)
+                        ?? BrandAssetStorageService.absoluteURL(for: relativePath)
+                    guard manager.isReadableFile(atPath: source.path) else {
+                        throw BackupServiceError.missingMedia(asset.originalFilename ?? asset.name)
+                    }
+                    let assetDirectory = brandDirectory.appendingPathComponent(asset.id.uuidString, isDirectory: true)
+                    try manager.createDirectory(at: assetDirectory, withIntermediateDirectories: true)
+                    let input = try FileHandle(forReadingFrom: source)
+                    defer { try? input.close() }
+                    var hasher = SHA256()
+                    var index = 0
+                    var byteCount: Int64 = 0
+                    while let chunk = try input.read(upToCount: chunkSize), !chunk.isEmpty {
+                        hasher.update(data: chunk)
+                        byteCount += Int64(chunk.count)
+                        let encrypted = try PasswordCrypto.seal(chunk, keyData: key)
+                        try encrypted.write(
+                            to: assetDirectory.appendingPathComponent(String(format: "%06d.enc", index)),
+                            options: .atomic
+                        )
+                        index += 1
+                    }
+                    brandFiles.append(BackupBrandFile(
+                        assetID: asset.id,
+                        relativePath: relativePath,
+                        byteCount: byteCount,
+                        chunkCount: index,
+                        sha256: Data(hasher.finalize()).hexString
+                    ))
+                }
+                snapshot.brandFiles = brandFiles
                 let encoder = JSONEncoder()
                 encoder.dateEncodingStrategy = .iso8601
                 let snapshotData = try encoder.encode(snapshot)
@@ -158,7 +208,7 @@ enum BackupService {
                   let info = try? decoder.decode(BackupPublicInfo.self, from: infoData) else {
                 throw BackupServiceError.invalidPackage
             }
-            guard info.formatVersion == BackupSnapshot.formatVersion,
+            guard (2...BackupSnapshot.formatVersion).contains(info.formatVersion),
                   info.iterations >= 100_000,
                   info.iterations <= 1_000_000,
                   info.chunkSize > 0,
@@ -170,16 +220,25 @@ enum BackupService {
             let encryptedSnapshot = try Data(contentsOf: package.appendingPathComponent(info.snapshotFilename))
             let snapshotData = try PasswordCrypto.open(encryptedSnapshot, keyData: key)
             let snapshot = try decoder.decode(BackupSnapshot.self, from: snapshotData)
-            guard snapshot.formatVersion == BackupSnapshot.formatVersion else {
+            guard snapshot.formatVersion == info.formatVersion,
+                  (2...BackupSnapshot.formatVersion).contains(snapshot.formatVersion) else {
                 throw BackupServiceError.unsupportedVersion
             }
             guard Set(snapshot.mediaAssets.map(\.id)) == Set(snapshot.mediaFiles.map(\.assetID)) else {
                 throw BackupServiceError.integrityCheckFailed("资料清单不一致")
             }
+            let brandAssetsWithFiles = Set((snapshot.brandAssets ?? []).compactMap { asset in
+                asset.relativePath?.isEmpty == false ? asset.id : nil
+            })
+            guard brandAssetsWithFiles == Set((snapshot.brandFiles ?? []).map(\.assetID)) else {
+                throw BackupServiceError.integrityCheckFailed("品牌素材清单不一致")
+            }
 
             let temporary = manager.temporaryDirectory.appendingPathComponent("SoulTowerRestore-\(UUID().uuidString)", isDirectory: true)
             let stagedRoot = temporary.appendingPathComponent("Media", isDirectory: true)
+            let stagedBrandRoot = temporary.appendingPathComponent("BrandAssets", isDirectory: true)
             try manager.createDirectory(at: stagedRoot, withIntermediateDirectories: true)
+            try manager.createDirectory(at: stagedBrandRoot, withIntermediateDirectories: true)
             do {
                 for file in snapshot.mediaFiles {
                     guard isSafeRelativePath(file.relativePath) else { throw BackupServiceError.unsafePath }
@@ -211,7 +270,36 @@ enum BackupService {
                         throw BackupServiceError.integrityCheckFailed(asset.originalFilename)
                     }
                 }
-                return PreparedRestore(snapshot: snapshot, stagedMediaRoot: stagedRoot)
+                for file in snapshot.brandFiles ?? [] {
+                    guard isSafeRelativePath(file.relativePath) else { throw BackupServiceError.unsafePath }
+                    guard let asset = (snapshot.brandAssets ?? []).first(where: { $0.id == file.assetID }) else {
+                        throw BackupServiceError.integrityCheckFailed("品牌素材索引缺失")
+                    }
+                    let sourceDirectory = package.appendingPathComponent("brand-media/\(file.assetID.uuidString)", isDirectory: true)
+                    let outputURL = stagedBrandRoot.appendingPathComponent(file.relativePath)
+                    if writeMedia {
+                        try manager.createDirectory(at: outputURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                        manager.createFile(atPath: outputURL.path, contents: nil)
+                    }
+                    let output = writeMedia ? try FileHandle(forWritingTo: outputURL) : nil
+                    defer { try? output?.close() }
+                    var hasher = SHA256()
+                    var byteCount: Int64 = 0
+                    for index in 0..<file.chunkCount {
+                        let chunkURL = sourceDirectory.appendingPathComponent(String(format: "%06d.enc", index))
+                        guard manager.isReadableFile(atPath: chunkURL.path) else {
+                            throw BackupServiceError.integrityCheckFailed(asset.originalFilename ?? asset.name)
+                        }
+                        let decrypted = try PasswordCrypto.open(Data(contentsOf: chunkURL), keyData: key)
+                        hasher.update(data: decrypted)
+                        byteCount += Int64(decrypted.count)
+                        try output?.write(contentsOf: decrypted)
+                    }
+                    guard byteCount == file.byteCount, Data(hasher.finalize()).hexString == file.sha256 else {
+                        throw BackupServiceError.integrityCheckFailed(asset.originalFilename ?? asset.name)
+                    }
+                }
+                return PreparedRestore(snapshot: snapshot, stagedMediaRoot: stagedRoot, stagedBrandAssetRoot: stagedBrandRoot)
             } catch {
                 try? manager.removeItem(at: temporary)
                 throw error
@@ -225,6 +313,9 @@ enum BackupService {
         do {
             try replaceModels(with: prepared.snapshot, context: context)
             try MediaStorageService.replaceMediaRoot(with: prepared.stagedMediaRoot)
+            if let stagedBrandAssetRoot = prepared.stagedBrandAssetRoot {
+                try BrandAssetStorageService.replaceBrandAssetRoot(with: stagedBrandAssetRoot)
+            }
         } catch {
             context.rollback()
             try? replaceModels(with: rollback, context: context)
@@ -232,6 +323,13 @@ enum BackupService {
         }
         try? FileManager.default.removeItem(at: prepared.stagedMediaRoot.deletingLastPathComponent())
     }
+
+    #if DEBUG
+    @MainActor
+    static func applySnapshotModelsForTesting(_ snapshot: BackupSnapshot, context: ModelContext) throws {
+        try replaceModels(with: snapshot, context: context)
+    }
+    #endif
 
     @MainActor
     static func rebuildFutureReminders(context: ModelContext) async {
@@ -263,6 +361,18 @@ enum BackupService {
         let existingAppointments = try context.fetch(FetchDescriptor<Appointment>())
         existingAppointments.forEach(NotificationScheduler.cancel)
 
+        try context.fetch(FetchDescriptor<BrandAssetActionTask>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandAssetUsage>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandAssetAuditEvent>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandMarketingTouchpoint>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandWeeklyReview>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandMetricSnapshot>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandPublishRecord>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandDraftRevision>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandDraft>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandContentTopic>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandAsset>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandProfile>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<MediaAsset>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<ConsultationActivity>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<ConsultationSummaryRevision>()).forEach(context.delete)
@@ -295,6 +405,18 @@ enum BackupService {
         (snapshot.serviceOrderChanges ?? []).map { $0.model() }.forEach(context.insert)
         (snapshot.consultationActivities ?? []).map { $0.model() }.forEach(context.insert)
         (snapshot.consultationSummaryRevisions ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandProfiles ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandTopics ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandDrafts ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandDraftRevisions ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandPublishRecords ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandAssets ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandMetricSnapshots ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandWeeklyReviews ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandMarketingTouchpoints ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandAssetAudits ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandAssetUsages ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandAssetTasks ?? []).map { $0.model() }.forEach(context.insert)
         try context.save()
     }
 

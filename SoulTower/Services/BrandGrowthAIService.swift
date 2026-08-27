@@ -57,6 +57,12 @@ enum BrandGrowthAIService {
         baseURL: String,
         modelName: String
     ) async throws -> BrandDraftPayload {
+        let inputRisks = BrandGrowthRiskService.evaluate(
+            title: topic.title,
+            content: topic.rawIdea,
+            profile: profile
+        )
+        guard inputRisks.isEmpty else { throw BrandGrowthWorkflowError.blockingRisk(inputRisks) }
         let response = try await LocalAIService().generateStructuredJSON(
             prompt: channelPrompt(channel: channel, topic: topic, profile: profile),
             baseURL: baseURL,

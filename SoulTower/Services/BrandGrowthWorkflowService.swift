@@ -45,6 +45,9 @@ enum BrandGrowthRiskService {
         if contains(pattern: #"(?:订单号|微信号|身份证)\s*[:：]?\s*[A-Za-z0-9_-]{5,}"#, in: allText) {
             risks.append("禁止批准：疑似包含客户识别信息")
         }
+        if contains(pattern: #"\d{4}[-/.年]\d{1,2}[-/.月]\d{1,2}日?"#, in: allText) {
+            risks.append("禁止批准：疑似包含客户精确日期")
+        }
         return Array(Set(risks)).sorted()
     }
 
@@ -74,10 +77,18 @@ enum BrandGrowthWorkflowService {
         return Array(Set(deterministic + aiBlocking)).sorted()
     }
 
-    static func approve(_ draft: BrandDraft, profile: BrandProfile, by reviewer: String, now: Date = .now) throws {
+    static func approve(
+        _ draft: BrandDraft,
+        profile: BrandProfile,
+        assets: [BrandAsset] = [],
+        consents: [ConsentRecord] = [],
+        by reviewer: String,
+        now: Date = .now
+    ) throws {
         let title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
         let content = draft.content.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty, !content.isEmpty else { throw BrandGrowthWorkflowError.emptyDraft }
+        try BrandAssetWorkflowService.validateDraft(draft, assets: assets, consents: consents, now: now)
         let risks = approvalRisks(for: draft, profile: profile)
         guard risks.isEmpty else { throw BrandGrowthWorkflowError.blockingRisk(risks) }
         draft.status = .approved
@@ -91,6 +102,8 @@ enum BrandGrowthWorkflowService {
 
     static func makePublishRecord(
         from draft: BrandDraft,
+        assets: [BrandAsset] = [],
+        consents: [ConsentRecord] = [],
         plannedAt: Date?,
         publishedAt: Date? = nil,
         platformPostID: String = "",
@@ -99,6 +112,7 @@ enum BrandGrowthWorkflowService {
         now: Date = .now
     ) throws -> BrandPublishRecord {
         guard draft.isApproved else { throw BrandGrowthWorkflowError.approvalRequired }
+        try BrandAssetWorkflowService.validateDraft(draft, assets: assets, consents: consents, now: now)
         return BrandPublishRecord(
             topicID: draft.topicID,
             draftID: draft.id,

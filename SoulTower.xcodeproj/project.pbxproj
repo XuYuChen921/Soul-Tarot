@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0DFCEB2F38BC4E1B91C88137 /* BrandGrowthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707253BA6BB5D08206FE1F3 /* BrandGrowthModels.swift */; };
 		10ACEEE64A78595414F7E8B8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46BF7D06AA59B0557643E4ED /* Client.swift */; };
+		1243A43E44ADFC68169E0CDE /* BrandGrowthM3Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6B213A51587C408E99A67B /* BrandGrowthM3Models.swift */; };
 		16A0C36DC23F82A8071BDD3B /* BrandGrowthWorkflowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261A97BFDA67FC79355DE244 /* BrandGrowthWorkflowService.swift */; };
 		17B45DF9479DECA8C36DCFE5 /* BusinessAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2CFFA24206DFF8003C44705 /* BusinessAnalytics.swift */; };
 		1A592F633A3169EBADB49571 /* ConsultationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9E4DDDFD93F4A27DE3F619 /* ConsultationRecord.swift */; };
@@ -17,6 +18,7 @@
 		2E76330C1DC5B18437D75BA3 /* MediaAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CF5AAB78BBA4C41D075502 /* MediaAsset.swift */; };
 		332F23F373548A70CD3B8EDF /* ClientsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAFAA31108C052A686CDFD4 /* ClientsView.swift */; };
 		33CD0FA22BEC5AD0E04A2011 /* SeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E304B9492761D8513E67C56C /* SeedService.swift */; };
+		349AD84DFABA252B117FEA2D /* BrandGrowthM3Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CF045416E13BE0205CDD20 /* BrandGrowthM3Views.swift */; };
 		3629D81EF8D99AE4B14FF83A /* OrderPaymentLedgerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2DA96EE6E5786AE216B6840 /* OrderPaymentLedgerService.swift */; };
 		3C65CD372A67AA07641BE2E2 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */; };
 		40ACF9D5E35C8AB76E415733 /* ConsultationActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395C5045C8D384FC4F7F5A47 /* ConsultationActivity.swift */; };
@@ -26,6 +28,7 @@
 		4BCC65A786469C588A08BD9F /* Appointment.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0329CDBC957A4D0432E45C /* Appointment.swift */; };
 		62328D4CC8E2FAB45C52CD08 /* AppSecurityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C233D7251C5001671F0964 /* AppSecurityManager.swift */; };
 		6386685069967823A96FCF7F /* ScheduleSyncDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4E27EC82BE74CB1392ABB3 /* ScheduleSyncDocument.swift */; };
+		655380E1EC45F8D3AFAD9ED1 /* BrandBackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839D742C4C1416E9A0940CFE /* BrandBackupModels.swift */; };
 		6A104FA7711BD3220426ACFB /* VoiceIntakeRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED5DBFD2ADB7825D396C65A /* VoiceIntakeRecorder.swift */; };
 		6BD61FE5863BF222CE644279 /* AudioSelfTestRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5A24AB94D425EBBC95D5C2 /* AudioSelfTestRecorder.swift */; };
 		6D4971A8DB3245B24C59233B /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5186EAA05B42A9C42722AC90 /* BackupService.swift */; };
@@ -58,11 +61,13 @@
 		D4FE4A604E000F38FCBA1D6C /* ServiceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD2E3FA8E667C90261F26F0 /* ServiceItem.swift */; };
 		D5801D26818FAEBA6C8B431C /* BusinessReportDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A39F23FA8F3D288BC14435A /* BusinessReportDocument.swift */; };
 		D89D9C690C19F4ABC35820CC /* MediaStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD103D7F0B2839E52294B3CF /* MediaStorageService.swift */; };
+		DA826D7BD4A85A3767DEFD71 /* BrandAssetStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8C9C7BAA88EA8C31A4ED2E /* BrandAssetStorageService.swift */; };
 		DDA0C02944D4EE850AA6ED9B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A74AEBF2E4B56D4734F94EF /* RootView.swift */; };
 		E216E63737B0B7D4BF42A5A8 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3428CD51F46F67A7524ED6 /* NotificationScheduler.swift */; };
 		E2986F01778C38C14CCEBA5C /* DefaultBusinessRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3594A56DD2324C4CAD2ED4 /* DefaultBusinessRules.swift */; };
 		E48D76166FCEAACD7301BA9F /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D773687EB60D8C4672A79AE6 /* KeychainStore.swift */; };
 		E6A2D0431718E54E7D135D4A /* ServiceOrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF01027021DCF93455CE96B7 /* ServiceOrdersView.swift */; };
+		E6DB3BBEE9D08A5AA8F8AD7A /* BrandAssetWorkflowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E487588EFDA2C877189895E6 /* BrandAssetWorkflowService.swift */; };
 		E728BACDA87D6D8A0C309585 /* BusinessRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D795B7D6CEFFC9A9D68005AE /* BusinessRulesTests.swift */; };
 		E8F45A675D2DA08CAC570E74 /* VoiceIntakeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31312B759B5323BA5F5A41F4 /* VoiceIntakeModels.swift */; };
 		EA370EFD21DC6422A849D8E7 /* PaymentTransactionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA0782F48BEC35BB6CB9A28 /* PaymentTransactionEditorView.swift */; };
@@ -128,6 +133,7 @@
 		55BD389EC3A2ABC0EB261B72 /* ConsultationWorkflowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationWorkflowService.swift; sourceTree = "<group>"; };
 		5691833369F407BA9CEB8911 /* RecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsView.swift; sourceTree = "<group>"; };
 		5A39F23FA8F3D288BC14435A /* BusinessReportDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessReportDocument.swift; sourceTree = "<group>"; };
+		5C8C9C7BAA88EA8C31A4ED2E /* BrandAssetStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetStorageService.swift; sourceTree = "<group>"; };
 		5FD2E3FA8E667C90261F26F0 /* ServiceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceItem.swift; sourceTree = "<group>"; };
 		65617B30E3E567B56B4D1A8E /* SoulTower.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SoulTower.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A74AEBF2E4B56D4734F94EF /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -135,12 +141,15 @@
 		71413B074EAFDF01F5FB4991 /* BrandGrowthM2Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandGrowthM2Models.swift; sourceTree = "<group>"; };
 		7838F6AF22ACD74629283EE7 /* ConsultationSummaryRevision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultationSummaryRevision.swift; sourceTree = "<group>"; };
 		7A2D8788331599DDF2B32A91 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockView.swift; sourceTree = "<group>"; };
+		839D742C4C1416E9A0940CFE /* BrandBackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandBackupModels.swift; sourceTree = "<group>"; };
 		85048C9FD64B3B890A5C40B8 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		88B245DD0545B1D8FCEBA4D9 /* PaymentTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentTransaction.swift; sourceTree = "<group>"; };
 		8CC1971699DE226276A99F11 /* LocalAudioTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAudioTranscriptionService.swift; sourceTree = "<group>"; };
+		8E6B213A51587C408E99A67B /* BrandGrowthM3Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandGrowthM3Models.swift; sourceTree = "<group>"; };
 		924ADB3541A80B51BABBCEDF /* NotificationPresentationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPresentationDelegate.swift; sourceTree = "<group>"; };
 		93CAE02F8B4FA1F6FD3ACF48 /* ServiceOrderChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrderChange.swift; sourceTree = "<group>"; };
 		9490C6B8D0ED4339D25CEC51 /* OrderPaymentTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderPaymentTransaction.swift; sourceTree = "<group>"; };
+		96CF045416E13BE0205CDD20 /* BrandGrowthM3Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandGrowthM3Views.swift; sourceTree = "<group>"; };
 		9895FDCF70EAB1F2DF2BC095 /* TestDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDataService.swift; sourceTree = "<group>"; };
 		9E9862EB8F535E3A56A1FE80 /* SoulTowerUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SoulTowerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0C233D7251C5001671F0964 /* AppSecurityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSecurityManager.swift; sourceTree = "<group>"; };
@@ -168,6 +177,7 @@
 		DE20F0D5027D62F892A3E2F4 /* BrandMetricImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandMetricImportService.swift; sourceTree = "<group>"; };
 		DF01027021DCF93455CE96B7 /* ServiceOrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrdersView.swift; sourceTree = "<group>"; };
 		E304B9492761D8513E67C56C /* SeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedService.swift; sourceTree = "<group>"; };
+		E487588EFDA2C877189895E6 /* BrandAssetWorkflowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetWorkflowService.swift; sourceTree = "<group>"; };
 		E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
 		E8B3DA7501F0F848CAA36EF1 /* PasswordCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordCrypto.swift; sourceTree = "<group>"; };
 		EC499A888A1AFDF256B5D8BB /* ServiceOrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceOrderDetailView.swift; sourceTree = "<group>"; };
@@ -199,6 +209,7 @@
 				4CC5C3B48FDD9FE5F0A11F6A /* AIWorkspaceView.swift */,
 				7A2D8788331599DDF2B32A91 /* AppLockView.swift */,
 				BC73B9D8A4DA474969DC9205 /* BrandGrowthM2Views.swift */,
+				96CF045416E13BE0205CDD20 /* BrandGrowthM3Views.swift */,
 				B24A8898E3ED1DD449FCA5D9 /* BrandGrowthView.swift */,
 				70C8CCF7B4667F48EB58509A /* BusinessView.swift */,
 				CDAFAA31108C052A686CDFD4 /* ClientsView.swift */,
@@ -222,6 +233,7 @@
 			children = (
 				CB0329CDBC957A4D0432E45C /* Appointment.swift */,
 				71413B074EAFDF01F5FB4991 /* BrandGrowthM2Models.swift */,
+				8E6B213A51587C408E99A67B /* BrandGrowthM3Models.swift */,
 				4707253BA6BB5D08206FE1F3 /* BrandGrowthModels.swift */,
 				46BF7D06AA59B0557643E4ED /* Client.swift */,
 				B10BB644E93FAC133AB9A4FA /* ConsentRecord.swift */,
@@ -249,6 +261,9 @@
 				CC5A24AB94D425EBBC95D5C2 /* AudioSelfTestRecorder.swift */,
 				E4E1CC8D07FAF7E2AE458B79 /* BackupModels.swift */,
 				5186EAA05B42A9C42722AC90 /* BackupService.swift */,
+				5C8C9C7BAA88EA8C31A4ED2E /* BrandAssetStorageService.swift */,
+				E487588EFDA2C877189895E6 /* BrandAssetWorkflowService.swift */,
+				839D742C4C1416E9A0940CFE /* BrandBackupModels.swift */,
 				06FEB7AAB742D6C278D3CD53 /* BrandGrowthAIService.swift */,
 				2BEEAE909C9E6D29FE3A315D /* BrandGrowthAnalyticsService.swift */,
 				261A97BFDA67FC79355DE244 /* BrandGrowthWorkflowService.swift */,
@@ -491,10 +506,15 @@
 				6BD61FE5863BF222CE644279 /* AudioSelfTestRecorder.swift in Sources */,
 				3C65CD372A67AA07641BE2E2 /* BackupModels.swift in Sources */,
 				6D4971A8DB3245B24C59233B /* BackupService.swift in Sources */,
+				DA826D7BD4A85A3767DEFD71 /* BrandAssetStorageService.swift in Sources */,
+				E6DB3BBEE9D08A5AA8F8AD7A /* BrandAssetWorkflowService.swift in Sources */,
+				655380E1EC45F8D3AFAD9ED1 /* BrandBackupModels.swift in Sources */,
 				910FCAEEDDECD22606019F27 /* BrandGrowthAIService.swift in Sources */,
 				8AD3EAB28C7BD9A448515B2B /* BrandGrowthAnalyticsService.swift in Sources */,
 				AAEBAD9B7BA19BE0E3CF449B /* BrandGrowthM2Models.swift in Sources */,
 				25AA42A511D34A996321E648 /* BrandGrowthM2Views.swift in Sources */,
+				1243A43E44ADFC68169E0CDE /* BrandGrowthM3Models.swift in Sources */,
+				349AD84DFABA252B117FEA2D /* BrandGrowthM3Views.swift in Sources */,
 				0DFCEB2F38BC4E1B91C88137 /* BrandGrowthModels.swift in Sources */,
 				740A17509EF7BDACDB6F184C /* BrandGrowthView.swift in Sources */,
 				16A0C36DC23F82A8071BDD3B /* BrandGrowthWorkflowService.swift in Sources */,

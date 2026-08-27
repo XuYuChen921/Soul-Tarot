@@ -336,6 +336,110 @@ enum SeedService {
         context.insert(review)
         try context.save()
     }
+
+    static func insertBrandM3UITestData(context: ModelContext) throws {
+        let clientCode = "C-UI-M3"
+        guard !((try context.fetch(FetchDescriptor<Client>())).contains { $0.clientCode == clientCode }) else { return }
+        let client = Client(
+            clientCode: clientCode,
+            displayName: "匿名授权测试客户",
+            source: "自动界面测试",
+            notes: "仅用于 M3 临时界面验证的虚构客户"
+        )
+        context.insert(client)
+        let consent = ConsentRecord(
+            clientID: client.id,
+            type: .anonymousContentUse,
+            textVersion: "ANON-UI-M3-1",
+            textSnapshot: "仅用于已完成去身份化复核的图文共性主题。全部为虚构测试数据。",
+            accepted: true,
+            confirmationMethod: "自动界面测试确认",
+            permissionScope: "匿名共性主题与成长练习",
+            allowedChannelsText: "微信朋友圈，小红书",
+            allowedFormatsText: "图文、匿名共性主题",
+            expiresAt: Calendar.current.date(byAdding: .year, value: 1, to: .now),
+            withdrawalMethod: "联系服务方登记撤回"
+        )
+        context.insert(consent)
+        let asset = BrandAsset(
+            name: "测试素材：关系边界匿名主题",
+            kind: .document,
+            source: "虚构客户主动反馈",
+            owner: "界面测试客户",
+            permission: .usable,
+            allowedChannelsText: "微信朋友圈，小红书",
+            useScope: "匿名共性主题与成长练习",
+            note: "全部为虚构界面测试数据",
+            category: .customerRelated,
+            clientID: client.id,
+            consentID: consent.id,
+            deidentifiedSummary: "有人过去习惯压下自己的需求，后来开始用事实、感受和请求练习表达边界。",
+            directIdentifiersRemoved: true,
+            indirectIdentifiersReviewed: true,
+            secondReviewCompleted: true,
+            secondReviewer: "M3 测试复核人",
+            reviewedAt: .now,
+            allowedFormatsText: "图文"
+        )
+        context.insert(asset)
+        context.insert(BrandAssetAuditEvent(
+            assetID: asset.id,
+            consentID: consent.id,
+            action: .reviewed,
+            detail: "虚构素材已完成独立授权和双重去身份化复核。",
+            actor: "自动界面测试"
+        ))
+
+        let withdrawnConsent = ConsentRecord(
+            clientID: client.id,
+            type: .anonymousContentUse,
+            textVersion: "ANON-UI-M3-OLD",
+            textSnapshot: "历史虚构测试授权",
+            accepted: true,
+            confirmedAt: Date.now.addingTimeInterval(-172_800),
+            confirmationMethod: "自动界面测试确认",
+            withdrawnAt: Date.now.addingTimeInterval(-86_400),
+            permissionScope: "历史测试范围",
+            allowedChannelsText: "微信朋友圈",
+            allowedFormatsText: "图文",
+            withdrawalMethod: "自动界面测试撤回"
+        )
+        context.insert(withdrawnConsent)
+        let withdrawnAsset = BrandAsset(
+            name: "测试素材：已撤回",
+            kind: .document,
+            source: "虚构历史反馈",
+            owner: "界面测试客户",
+            permission: .withdrawn,
+            allowedChannelsText: "微信朋友圈",
+            revokedAt: withdrawnConsent.withdrawnAt,
+            useScope: "历史测试范围",
+            category: .customerRelated,
+            clientID: client.id,
+            consentID: withdrawnConsent.id,
+            deidentifiedSummary: "已撤回的虚构测试摘要",
+            directIdentifiersRemoved: true,
+            indirectIdentifiersReviewed: true,
+            secondReviewCompleted: true,
+            secondReviewer: "M3 测试复核人",
+            reviewedAt: Date.now.addingTimeInterval(-172_800),
+            allowedFormatsText: "图文"
+        )
+        context.insert(withdrawnAsset)
+        context.insert(BrandAssetActionTask(
+            assetID: withdrawnAsset.id,
+            type: .reviewPublishedContent,
+            detail: "虚构外部内容需要人工下架或修改；系统未操作平台。"
+        ))
+        context.insert(BrandAssetAuditEvent(
+            assetID: withdrawnAsset.id,
+            consentID: withdrawnConsent.id,
+            action: .withdrawn,
+            detail: "虚构客户已撤回授权，素材已停止再次使用。",
+            actor: "自动界面测试"
+        ))
+        try context.save()
+    }
     #endif
 
     private static var defaultServices: [ServiceItem] {

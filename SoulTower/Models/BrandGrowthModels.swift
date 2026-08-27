@@ -97,9 +97,11 @@ enum BrandAssetType: String, CaseIterable, Codable, Identifiable {
 }
 
 enum BrandAssetPermission: String, CaseIterable, Codable, Identifiable {
+    case pendingReview = "待核验"
     case usable = "可用"
     case expired = "已到期"
     case withdrawn = "已撤回"
+    case prohibited = "禁止使用"
 
     var id: String { rawValue }
 }
@@ -238,6 +240,7 @@ final class BrandContentTopic {
     var sourceTypeRaw: String
     var sensitivity: String
     var customerReference: String
+    var linkedAssetIDsText: String? = nil
     var actionHint: String
     var priority: Int
     var plannedPublishAt: Date?
@@ -272,6 +275,7 @@ final class BrandContentTopic {
         sourceType: BrandTopicSource,
         sensitivity: String,
         customerReference: String,
+        linkedAssetIDsText: String? = nil,
         actionHint: String,
         priority: Int,
         plannedPublishAt: Date? = nil,
@@ -290,6 +294,7 @@ final class BrandContentTopic {
         self.sourceTypeRaw = sourceType.rawValue
         self.sensitivity = sensitivity
         self.customerReference = customerReference
+        self.linkedAssetIDsText = linkedAssetIDsText
         self.actionHint = actionHint
         self.priority = priority
         self.plannedPublishAt = plannedPublishAt
@@ -297,6 +302,12 @@ final class BrandContentTopic {
         self.isArchived = isArchived
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+    }
+
+    var linkedAssetIDs: [UUID] {
+        (linkedAssetIDsText ?? "")
+            .components(separatedBy: ",")
+            .compactMap { UUID(uuidString: $0.trimmingCharacters(in: .whitespacesAndNewlines)) }
     }
 }
 
@@ -327,6 +338,7 @@ final class BrandDraft {
     var approvedBy: String
     var createdAt: Date
     var updatedAt: Date
+    var linkedAssetIDsText: String? = nil
 
     var channel: BrandDistributionChannel {
         get { BrandDistributionChannel(rawValue: channelRaw) ?? .wechatMoments }
@@ -372,7 +384,8 @@ final class BrandDraft {
         status: BrandDraftStatus = .drafting,
         version: Int = 1,
         createdAt: Date = .now,
-        updatedAt: Date = .now
+        updatedAt: Date = .now,
+        linkedAssetIDsText: String? = nil
     ) {
         self.id = id
         self.topicID = topicID
@@ -399,6 +412,13 @@ final class BrandDraft {
         self.approvedBy = ""
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.linkedAssetIDsText = linkedAssetIDsText
+    }
+
+    var linkedAssetIDs: [UUID] {
+        (linkedAssetIDsText ?? "")
+            .components(separatedBy: ",")
+            .compactMap { UUID(uuidString: $0.trimmingCharacters(in: .whitespacesAndNewlines)) }
     }
 
     func approve(by name: String) {
@@ -599,6 +619,20 @@ final class BrandAsset {
     var note: String
     var createdAt: Date
     var updatedAt: Date
+    var categoryRaw: String? = nil
+    var clientID: UUID? = nil
+    var consentID: UUID? = nil
+    var originalFilename: String? = nil
+    var relativePath: String? = nil
+    var fileSize: Int64? = nil
+    var sha256: String? = nil
+    var deidentifiedSummary: String? = nil
+    var directIdentifiersRemoved: Bool? = nil
+    var indirectIdentifiersReviewed: Bool? = nil
+    var secondReviewCompleted: Bool? = nil
+    var secondReviewer: String? = nil
+    var reviewedAt: Date? = nil
+    var allowedFormatsText: String? = nil
 
     var kind: BrandAssetType {
         get { BrandAssetType(rawValue: kindRaw) ?? .photo }
@@ -630,7 +664,21 @@ final class BrandAsset {
         useScope: String = "",
         note: String = "",
         createdAt: Date = .now,
-        updatedAt: Date = .now
+        updatedAt: Date = .now,
+        category: BrandAssetCategory = .brandOwned,
+        clientID: UUID? = nil,
+        consentID: UUID? = nil,
+        originalFilename: String? = nil,
+        relativePath: String? = nil,
+        fileSize: Int64? = nil,
+        sha256: String? = nil,
+        deidentifiedSummary: String? = nil,
+        directIdentifiersRemoved: Bool = false,
+        indirectIdentifiersReviewed: Bool = false,
+        secondReviewCompleted: Bool = false,
+        secondReviewer: String? = nil,
+        reviewedAt: Date? = nil,
+        allowedFormatsText: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -645,6 +693,35 @@ final class BrandAsset {
         self.note = note
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.categoryRaw = category.rawValue
+        self.clientID = clientID
+        self.consentID = consentID
+        self.originalFilename = originalFilename
+        self.relativePath = relativePath
+        self.fileSize = fileSize
+        self.sha256 = sha256
+        self.deidentifiedSummary = deidentifiedSummary
+        self.directIdentifiersRemoved = directIdentifiersRemoved
+        self.indirectIdentifiersReviewed = indirectIdentifiersReviewed
+        self.secondReviewCompleted = secondReviewCompleted
+        self.secondReviewer = secondReviewer
+        self.reviewedAt = reviewedAt
+        self.allowedFormatsText = allowedFormatsText
+    }
+
+    var category: BrandAssetCategory {
+        get { BrandAssetCategory(rawValue: categoryRaw ?? "") ?? .brandOwned }
+        set { categoryRaw = newValue.rawValue }
+    }
+
+    var isCustomerRelated: Bool { category == .customerRelated }
+
+    var hasCompletedDeidentification: Bool {
+        directIdentifiersRemoved == true
+            && indirectIdentifiersReviewed == true
+            && secondReviewCompleted == true
+            && !(secondReviewer ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && reviewedAt != nil
     }
 }
 

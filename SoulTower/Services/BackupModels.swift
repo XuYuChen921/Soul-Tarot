@@ -1,7 +1,7 @@
 import Foundation
 
 struct BackupSnapshot: Codable, Sendable {
-    static let formatVersion = 2
+    static let formatVersion = 3
 
     var formatVersion: Int
     var createdAt: Date
@@ -20,6 +20,19 @@ struct BackupSnapshot: Codable, Sendable {
     var consultationActivities: [BackupConsultationActivity]? = nil
     var consultationSummaryRevisions: [BackupConsultationSummaryRevision]? = nil
     var mediaFiles: [BackupMediaFile]
+    var brandProfiles: [BackupBrandProfile]? = nil
+    var brandTopics: [BackupBrandTopic]? = nil
+    var brandDrafts: [BackupBrandDraft]? = nil
+    var brandDraftRevisions: [BackupBrandDraftRevision]? = nil
+    var brandPublishRecords: [BackupBrandPublishRecord]? = nil
+    var brandAssets: [BackupBrandAsset]? = nil
+    var brandMetricSnapshots: [BackupBrandMetricSnapshot]? = nil
+    var brandWeeklyReviews: [BackupBrandWeeklyReview]? = nil
+    var brandMarketingTouchpoints: [BackupBrandMarketingTouchpoint]? = nil
+    var brandAssetAudits: [BackupBrandAssetAudit]? = nil
+    var brandAssetUsages: [BackupBrandAssetUsage]? = nil
+    var brandAssetTasks: [BackupBrandAssetTask]? = nil
+    var brandFiles: [BackupBrandFile]? = nil
 }
 
 struct BackupClient: Codable, Sendable {
@@ -133,16 +146,24 @@ struct BackupConsent: Codable, Sendable {
     var confirmedAt: Date
     var confirmationMethod: String
     var withdrawnAt: Date?
+    var permissionScope: String? = nil
+    var allowedChannelsText: String? = nil
+    var allowedFormatsText: String? = nil
+    var expiresAt: Date? = nil
+    var withdrawalMethod: String? = nil
 
     init(_ value: ConsentRecord) {
         id = value.id; clientID = value.clientID; appointmentID = value.appointmentID; serviceOrderID = value.serviceOrderID
         typeRaw = value.typeRaw; textVersion = value.textVersion; textSnapshot = value.textSnapshot
         accepted = value.accepted; confirmedAt = value.confirmedAt
         confirmationMethod = value.confirmationMethod; withdrawnAt = value.withdrawnAt
+        permissionScope = value.permissionScope; allowedChannelsText = value.allowedChannelsText
+        allowedFormatsText = value.allowedFormatsText; expiresAt = value.expiresAt
+        withdrawalMethod = value.withdrawalMethod
     }
 
     func model() -> ConsentRecord {
-        ConsentRecord(id: id, clientID: clientID, appointmentID: appointmentID, serviceOrderID: serviceOrderID, type: ConsentType(rawValue: typeRaw) ?? .servicePolicy, textVersion: textVersion, textSnapshot: textSnapshot, accepted: accepted, confirmedAt: confirmedAt, confirmationMethod: confirmationMethod, withdrawnAt: withdrawnAt)
+        ConsentRecord(id: id, clientID: clientID, appointmentID: appointmentID, serviceOrderID: serviceOrderID, type: ConsentType(rawValue: typeRaw) ?? .servicePolicy, textVersion: textVersion, textSnapshot: textSnapshot, accepted: accepted, confirmedAt: confirmedAt, confirmationMethod: confirmationMethod, withdrawnAt: withdrawnAt, permissionScope: permissionScope, allowedChannelsText: allowedChannelsText, allowedFormatsText: allowedFormatsText, expiresAt: expiresAt, withdrawalMethod: withdrawalMethod)
     }
 }
 
@@ -493,4 +514,5 @@ struct BackupPublicInfo: Codable, Sendable {
 struct PreparedRestore: Sendable {
     var snapshot: BackupSnapshot
     var stagedMediaRoot: URL
+    var stagedBrandAssetRoot: URL? = nil
 }

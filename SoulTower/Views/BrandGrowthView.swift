@@ -8,6 +8,7 @@ private enum BrandGrowthPage: String, CaseIterable, Identifiable {
     case data = "数据中心"
     case attribution = "询盘归因"
     case weeklyReview = "每周复盘"
+    case assets = "素材授权"
     case settings = "品牌设置"
 
     var id: String { rawValue }
@@ -27,6 +28,8 @@ struct BrandGrowthView: View {
     @Query private var serviceOrders: [ServiceOrder]
     @Query private var appointmentPayments: [PaymentTransaction]
     @Query private var orderPayments: [OrderPaymentTransaction]
+    @Query private var brandAssets: [BrandAsset]
+    @Query private var consents: [ConsentRecord]
 
     @State private var page: BrandGrowthPage = .overview
     @State private var selectedTopicID: UUID?
@@ -86,6 +89,8 @@ struct BrandGrowthView: View {
                         BrandAttributionPage()
                     case .weeklyReview:
                         BrandWeeklyReviewPage()
+                    case .assets:
+                        BrandAssetLibraryPage()
                     case .settings:
                         settingsPage
                     }
@@ -195,10 +200,10 @@ struct BrandGrowthView: View {
             }
 
             sectionCard(title: "首阶段边界", icon: "shield.lefthalf.filled") {
-                Label("只使用个人观点、公开资料和品牌自有素材", systemImage: "checkmark.circle.fill")
+                Label("客户素材只有在独立授权与双重去身份化通过后才可使用", systemImage: "checkmark.circle.fill")
                 Label("AI 草稿必须逐平台人工批准，系统不自动发布", systemImage: "checkmark.circle.fill")
                 Label("数据快照只新增不覆盖，缺失值不补 0；归因必须有人工证据", systemImage: "checkmark.circle.fill")
-                Label("客户案例、私聊监控、非官方爬取和无人审核发布均未启用", systemImage: "nosign")
+                Label("客户原文、原始录音、私聊监控、非官方爬取和无人审核发布均未启用", systemImage: "nosign")
                     .foregroundStyle(.secondary)
             }
         }
@@ -456,7 +461,13 @@ struct BrandGrowthView: View {
 
     private func approve(_ draft: BrandDraft, profile: BrandProfile) {
         do {
-            try BrandGrowthWorkflowService.approve(draft, profile: profile, by: "本机使用者")
+            try BrandGrowthWorkflowService.approve(
+                draft,
+                profile: profile,
+                assets: brandAssets,
+                consents: consents,
+                by: "本机使用者"
+            )
             let topicDrafts = drafts.filter { $0.topicID == draft.topicID }
             if topicDrafts.count == BrandDistributionChannel.allCases.count,
                topicDrafts.allSatisfy(\.isApproved),
@@ -476,6 +487,12 @@ struct BrandGrowthView: View {
         Task {
             defer { isGenerating = false }
             do {
+                try BrandAssetWorkflowService.validateTopic(
+                    source: topic.sourceType,
+                    linkedAssetIDs: topic.linkedAssetIDs,
+                    assets: brandAssets,
+                    consents: consents
+                )
                 let bundle = try await BrandGrowthAIService.generateDraftBundle(
                     for: topic,
                     profile: profile,
@@ -516,6 +533,7 @@ struct BrandGrowthView: View {
             riskWarnings: Array(Set(payload.riskWarnings + deterministic)).sorted()
         )
         draft.apply(checked, source: .ai, modelName: appState.aiModelName, profileVersion: profile.profileVersion)
+        draft.linkedAssetIDsText = topic.linkedAssetIDsText
     }
 
     private func present(_ message: String) {
@@ -536,6 +554,8 @@ struct BrandGrowthView: View {
 private struct NewBrandTopicSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \BrandAsset.updatedAt, order: .reverse) private var brandAssets: [BrandAsset]
+    @Query private var consents: [ConsentRecord]
     let profile: BrandProfile
     let onCreated: (UUID) -> Void
 
@@ -546,6 +566,7 @@ private struct NewBrandTopicSheet: View {
     @State private var goal: BrandTopicGoal = .trust
     @State private var source: BrandTopicSource = .personalOpinion
     @State private var actionHint = ""
+    @State private var selectedAssetID: UUID?
     @State private var errorMessage = ""
 
     var body: some View {
@@ -560,12 +581,22 @@ private struct NewBrandTopicSheet: View {
                         ForEach(BrandTopicGoal.allCases) { Text($0.rawValue).tag($0) }
                     }
                     Picker("来源", selection: $source) {
-                        ForEach(BrandTopicSource.allCases.filter(\.availableInM1)) { Text($0.rawValue).tag($0) }
+                        ForEach(BrandTopicSource.allCases.filter { $0 != .historicalReuse }) { Text($0.rawValue).tag($0) }
+                    }
+                    if source == .customerTheme || source == .brandMaterial {
+                        Picker("关联素材", selection: $selectedAssetID) {
+                            Text("请选择").tag(nil as UUID?)
+                            ForEach(selectableAssets) { asset in
+                                Text("\(asset.name) · \(asset.permission.rawValue)").tag(asset.id as UUID?)
+                            }
+                        }
                     }
                     TextField("行动提示", text: $actionHint)
                 }
-                Section("M1 来源边界") {
-                    Text("客户共性主题和历史内容复用暂未启用；不能放入客户姓名、私聊、录音或其他身份信息。")
+                Section("来源边界") {
+                    Text(source == .customerTheme
+                         ? "客户来源正文只读取素材库中的去身份化摘要，不读取客户姓名、联系方式、原始录音或咨询原文。"
+                         : "历史内容复用仍未启用；客户相关信息只能通过素材授权页完成门槛检查后使用。")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
                 if !errorMessage.isEmpty {
@@ -583,9 +614,18 @@ private struct NewBrandTopicSheet: View {
 
     private func create() {
         do {
-            try BrandGrowthWorkflowService.validateM1Source(source)
             let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-            let cleanIdea = rawIdea.trimmingCharacters(in: .whitespacesAndNewlines)
+            let linkedAssetIDs = selectedAssetID.map { [$0] } ?? []
+            try BrandAssetWorkflowService.validateTopic(
+                source: source,
+                linkedAssetIDs: linkedAssetIDs,
+                assets: brandAssets,
+                consents: consents
+            )
+            let selectedAsset = selectedAssetID.flatMap { id in brandAssets.first(where: { $0.id == id }) }
+            let cleanIdea = source == .customerTheme
+                ? (selectedAsset?.deidentifiedSummary ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                : rawIdea.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !cleanTitle.isEmpty, !cleanIdea.isEmpty else {
                 errorMessage = "选题标题和原始观点不能为空。"
                 return
@@ -598,14 +638,30 @@ private struct NewBrandTopicSheet: View {
                 pillar: pillar,
                 goal: goal,
                 sourceType: source,
-                sensitivity: "公开/品牌内容",
-                customerReference: "",
+                sensitivity: source == .customerTheme ? "客户匿名主题，已通过双重去身份化" : "公开/品牌内容",
+                customerReference: source == .customerTheme ? "已通过素材授权门槛" : "",
+                linkedAssetIDsText: linkedAssetIDs.map(\.uuidString).joined(separator: ","),
                 actionHint: actionHint,
                 priority: 2
             )
             modelContext.insert(topic)
             for channel in BrandDistributionChannel.allCases {
-                modelContext.insert(BrandDraft(topicID: topic.id, channel: channel, profileVersion: profile.profileVersion))
+                let draft = BrandDraft(
+                    topicID: topic.id,
+                    channel: channel,
+                    profileVersion: profile.profileVersion,
+                    linkedAssetIDsText: topic.linkedAssetIDsText
+                )
+                modelContext.insert(draft)
+                for assetID in linkedAssetIDs {
+                    modelContext.insert(BrandAssetUsage(
+                        assetID: assetID,
+                        topicID: topic.id,
+                        draftID: draft.id,
+                        channel: channel,
+                        action: "建立内容草稿"
+                    ))
+                }
             }
             try modelContext.save()
             onCreated(topic.id)
@@ -613,6 +669,16 @@ private struct NewBrandTopicSheet: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private var selectableAssets: [BrandAsset] {
+        let category: BrandAssetCategory? = source == .customerTheme ? .customerRelated : nil
+        return BrandAssetWorkflowService.usableAssets(
+            from: brandAssets,
+            consents: consents,
+            category: category
+        )
+        .filter { source != .brandMaterial || !$0.isCustomerRelated }
     }
 }
 
@@ -737,6 +803,8 @@ private struct BrandDraftEditorSheet: View {
 private struct ScheduleBrandDraftSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query private var brandAssets: [BrandAsset]
+    @Query private var consents: [ConsentRecord]
     let draft: BrandDraft
     @State private var plannedAt = Date().addingTimeInterval(86_400)
     @State private var errorMessage = ""
@@ -762,8 +830,23 @@ private struct ScheduleBrandDraftSheet: View {
 
     private func schedule() {
         do {
-            let record = try BrandGrowthWorkflowService.makePublishRecord(from: draft, plannedAt: plannedAt)
+            let record = try BrandGrowthWorkflowService.makePublishRecord(
+                from: draft,
+                assets: brandAssets,
+                consents: consents,
+                plannedAt: plannedAt
+            )
             modelContext.insert(record)
+            for assetID in draft.linkedAssetIDs {
+                modelContext.insert(BrandAssetUsage(
+                    assetID: assetID,
+                    topicID: draft.topicID,
+                    draftID: draft.id,
+                    publishRecordID: record.id,
+                    channel: draft.channel,
+                    action: "加入发布日历"
+                ))
+            }
             try modelContext.save()
             dismiss()
         } catch {
@@ -777,6 +860,8 @@ private struct BrandPublishRecordEditorSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var topics: [BrandContentTopic]
     @Query private var allPublishRecords: [BrandPublishRecord]
+    @Query private var drafts: [BrandDraft]
+    @Query private var assetUsages: [BrandAssetUsage]
     let record: BrandPublishRecord
     @State private var isPublished: Bool
     @State private var publishedAt: Date
@@ -831,12 +916,34 @@ private struct BrandPublishRecordEditorSheet: View {
             errorMessage = "发布后至少填写链接、内容编号或备注之一。"
             return
         }
+        let newlyPublished = isPublished && !record.isPublished
         record.publishedAt = isPublished ? publishedAt : nil
         record.platformPostID = platformPostID
         record.platformLink = platformLink
         record.note = note
         record.publishedAsApproved = publishedAsApproved
         record.updatedAt = .now
+        if newlyPublished,
+           let draftID = record.draftID,
+           let draft = drafts.first(where: { $0.id == draftID }) {
+            for assetID in draft.linkedAssetIDs where !assetUsages.contains(where: {
+                $0.assetID == assetID && $0.publishRecordID == record.id && $0.action == "登记实际发布"
+            }) {
+                modelContext.insert(BrandAssetUsage(
+                    assetID: assetID,
+                    topicID: draft.topicID,
+                    draftID: draft.id,
+                    publishRecordID: record.id,
+                    channel: record.channel,
+                    action: "登记实际发布"
+                ))
+                modelContext.insert(BrandAssetAuditEvent(
+                    assetID: assetID,
+                    action: .published,
+                    detail: "已登记\(record.channel.rawValue)实际发布记录；保留当时文本快照。"
+                ))
+            }
+        }
         if isPublished,
            let topic = topics.first(where: { $0.id == record.topicID }) {
             let publishedChannels = Set(allPublishRecords

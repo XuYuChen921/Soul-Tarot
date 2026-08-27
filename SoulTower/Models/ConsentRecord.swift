@@ -14,6 +14,11 @@ final class ConsentRecord {
     var confirmedAt: Date
     var confirmationMethod: String
     var withdrawnAt: Date?
+    var permissionScope: String? = nil
+    var allowedChannelsText: String? = nil
+    var allowedFormatsText: String? = nil
+    var expiresAt: Date? = nil
+    var withdrawalMethod: String? = nil
 
     var type: ConsentType {
         get { ConsentType(rawValue: typeRaw) ?? .servicePolicy }
@@ -31,7 +36,12 @@ final class ConsentRecord {
         accepted: Bool,
         confirmedAt: Date = .now,
         confirmationMethod: String = "微信文字确认",
-        withdrawnAt: Date? = nil
+        withdrawnAt: Date? = nil,
+        permissionScope: String? = nil,
+        allowedChannelsText: String? = nil,
+        allowedFormatsText: String? = nil,
+        expiresAt: Date? = nil,
+        withdrawalMethod: String? = nil
     ) {
         self.id = id
         self.clientID = clientID
@@ -44,5 +54,24 @@ final class ConsentRecord {
         self.confirmedAt = confirmedAt
         self.confirmationMethod = confirmationMethod
         self.withdrawnAt = withdrawnAt
+        self.permissionScope = permissionScope
+        self.allowedChannelsText = allowedChannelsText
+        self.allowedFormatsText = allowedFormatsText
+        self.expiresAt = expiresAt
+        self.withdrawalMethod = withdrawalMethod
+    }
+
+    var isActiveAnonymousContentConsent: Bool {
+        type == .anonymousContentUse
+            && accepted
+            && withdrawnAt == nil
+            && (expiresAt == nil || expiresAt! >= .now)
+    }
+
+    var allowedBrandChannels: [BrandDistributionChannel] {
+        (allowedChannelsText ?? "")
+            .components(separatedBy: CharacterSet(charactersIn: ",，;；\n"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .compactMap(BrandDistributionChannel.init(rawValue:))
     }
 }
