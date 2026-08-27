@@ -1,7 +1,7 @@
 import Foundation
 
 struct BackupSnapshot: Codable, Sendable {
-    static let formatVersion = 3
+    static let formatVersion = 4
 
     var formatVersion: Int
     var createdAt: Date
@@ -32,6 +32,10 @@ struct BackupSnapshot: Codable, Sendable {
     var brandAssetAudits: [BackupBrandAssetAudit]? = nil
     var brandAssetUsages: [BackupBrandAssetUsage]? = nil
     var brandAssetTasks: [BackupBrandAssetTask]? = nil
+    var brandPlatformConnections: [BackupBrandPlatformConnection]? = nil
+    var brandSyncRuns: [BackupBrandSyncRun]? = nil
+    var brandSyncReceipts: [BackupBrandSyncReceipt]? = nil
+    var brandExperiments: [BackupBrandExperiment]? = nil
     var brandFiles: [BackupBrandFile]? = nil
 }
 

@@ -1744,7 +1744,8 @@ final class BusinessRulesTests: XCTestCase {
             ConsultationSummaryRevision.self, BrandProfile.self, BrandContentTopic.self, BrandDraft.self,
             BrandDraftRevision.self, BrandPublishRecord.self, BrandAsset.self, BrandMetricSnapshot.self,
             BrandWeeklyReview.self, BrandMarketingTouchpoint.self, BrandAssetAuditEvent.self,
-            BrandAssetUsage.self, BrandAssetActionTask.self
+            BrandAssetUsage.self, BrandAssetActionTask.self, BrandPlatformConnection.self,
+            BrandSyncRun.self, BrandSyncItemReceipt.self, BrandExperiment.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])
@@ -1848,5 +1849,220 @@ final class BusinessRulesTests: XCTestCase {
         let restoredURL = try XCTUnwrap(prepared.stagedBrandAssetRoot).appendingPathComponent(relativePath)
         XCTAssertEqual(try Data(contentsOf: restoredURL), sourceData)
         XCTAssertEqual(prepared.snapshot.brandFiles?.count, 1)
+    }
+
+    func testBrandM4CapabilityRegistryDoesNotOverstatePersonalPlatformAPIs() {
+        let wechat = BrandPlatformCapabilityRegistry.report(for: .wechatPersonalMoments)
+        XCTAssertEqual(wechat.capability, .manualImportOnly)
+        XCTAssertEqual(wechat.status, .manualOnly)
+        XCTAssertFalse(wechat.supportsMetricSync)
+
+        let xiaohongshu = BrandPlatformCapabilityRegistry.report(for: .xiaohongshuOpenAccount)
+        XCTAssertEqual(xiaohongshu.capability, .basicIdentityOnly)
+        XCTAssertFalse(xiaohongshu.supportsMetricSync)
+
+        let wecom = BrandPlatformCapabilityRegistry.report(for: .wecomCustomerMoments)
+        XCTAssertEqual(wecom.status, .verificationRequired)
+        XCTAssertFalse(wecom.supportsMetricSync)
+    }
+
+    func testBrandM4StaleStateNeverTreatsOldOrMissingSyncAsLatest() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        XCTAssertTrue(BrandPlatformAutomationService.isStale(lastSuccessfulSyncAt: nil, now: now))
+        XCTAssertFalse(BrandPlatformAutomationService.isStale(lastSuccessfulSyncAt: now.addingTimeInterval(-47 * 3_600), now: now))
+        XCTAssertTrue(BrandPlatformAutomationService.isStale(lastSuccessfulSyncAt: now.addingTimeInterval(-49 * 3_600), now: now))
+    }
+
+    @MainActor
+    func testBrandM4OfficialPayloadImportIsAppendOnlyAndIdempotent() throws {
+        let schema = Schema([
+            BrandContentTopic.self, BrandDraft.self, BrandPublishRecord.self, BrandMetricSnapshot.self,
+            BrandPlatformConnection.self, BrandSyncRun.self, BrandSyncItemReceipt.self, BrandExperiment.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let record = BrandPublishRecord(
+            topicID: UUID(), channel: .xiaohongshu, publishedAt: .now.addingTimeInterval(-3_600),
+            platformPostID: "M4-REMOTE-POST", snapshotTitle: "接口幂等测试", snapshotContent: "虚构内容"
+        )
+        let connection = BrandPlatformConnection(
+            platform: .xiaohongshuOpenAccount,
+            accountLabel: "已验收测试账号",
+            accountType: "测试账号",
+            capability: .officialMetricSync,
+            status: .connected,
+            officialDocumentURL: "https://example.invalid",
+            verificationNote: "仅单元测试",
+            isAPIApproved: true
+        )
+        context.insert(record)
+        context.insert(connection)
+        let payload = BrandRemoteMetricPayload(
+            remoteItemID: "metric-001",
+            publishRecordID: record.id,
+            collectedAt: .now,
+            periodStart: .now.addingTimeInterval(-3_600),
+            periodEnd: .now.addingTimeInterval(1),
+            exposure: 300,
+            views: 180,
+            likes: 20,
+            comments: 3,
+            favorites: 7,
+            shares: 2,
+            profileVisits: nil,
+            followers: nil,
+            privateMessages: 1,
+            missingReasons: "主页访问、新增关注未提供",
+            isCumulative: true
+        )
+        let firstRun = BrandSyncRun(connectionID: connection.id)
+        context.insert(firstRun)
+        try BrandPlatformAutomationService.importPayloads([payload], connection: connection, run: firstRun, context: context)
+        XCTAssertEqual(firstRun.status, .succeeded)
+        XCTAssertEqual(firstRun.importedCount, 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<BrandMetricSnapshot>()), 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<BrandSyncItemReceipt>()), 1)
+
+        let retryRun = BrandSyncRun(connectionID: connection.id)
+        context.insert(retryRun)
+        try BrandPlatformAutomationService.importPayloads([payload], connection: connection, run: retryRun, context: context)
+        XCTAssertEqual(retryRun.importedCount, 0)
+        XCTAssertEqual(retryRun.skippedDuplicateCount, 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<BrandMetricSnapshot>()), 1)
+    }
+
+    @MainActor
+    func testBrandM4InvalidBatchWritesNoPartialSnapshotsAndKeepsLastSuccess() throws {
+        let schema = Schema([
+            BrandContentTopic.self, BrandDraft.self, BrandPublishRecord.self, BrandMetricSnapshot.self,
+            BrandPlatformConnection.self, BrandSyncRun.self, BrandSyncItemReceipt.self, BrandExperiment.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let oldSuccess = Date.now.addingTimeInterval(-86_400)
+        let record = BrandPublishRecord(
+            topicID: UUID(), channel: .wechatMoments, publishedAt: .now.addingTimeInterval(-7_200),
+            platformPostID: "M4-ATOMIC", snapshotTitle: "原子写入测试", snapshotContent: "虚构内容"
+        )
+        let connection = BrandPlatformConnection(
+            platform: .wechatPersonalMoments,
+            accountLabel: "测试连接",
+            accountType: "测试账号",
+            capability: .officialMetricSync,
+            status: .connected,
+            officialDocumentURL: "https://example.invalid",
+            verificationNote: "仅单元测试",
+            isAPIApproved: true,
+            lastSuccessfulSyncAt: oldSuccess
+        )
+        let run = BrandSyncRun(connectionID: connection.id)
+        context.insert(record)
+        context.insert(connection)
+        context.insert(run)
+        let valid = BrandRemoteMetricPayload(
+            remoteItemID: "valid", publishRecordID: record.id, collectedAt: .now,
+            periodStart: .now.addingTimeInterval(-3_600), periodEnd: .now,
+            exposure: 10, views: 8, likes: 1, comments: 0, favorites: 0, shares: 0,
+            profileVisits: nil, followers: nil, privateMessages: nil,
+            missingReasons: "部分字段未提供", isCumulative: true
+        )
+        let invalid = BrandRemoteMetricPayload(
+            remoteItemID: "invalid", publishRecordID: record.id, collectedAt: .now,
+            periodStart: .now, periodEnd: .now.addingTimeInterval(-1),
+            exposure: -1, views: nil, likes: nil, comments: nil, favorites: nil, shares: nil,
+            profileVisits: nil, followers: nil, privateMessages: nil,
+            missingReasons: "无效测试", isCumulative: true
+        )
+
+        XCTAssertThrowsError(try BrandPlatformAutomationService.importPayloads([valid, invalid], connection: connection, run: run, context: context))
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<BrandMetricSnapshot>()), 0)
+        XCTAssertEqual(connection.lastSuccessfulSyncAt, oldSuccess)
+        BrandPlatformAutomationService.markFailure(BrandPlatformSyncError.invalidPayload, connection: connection, run: run)
+        XCTAssertEqual(run.status, .failed)
+        XCTAssertEqual(connection.lastSuccessfulSyncAt, oldSuccess)
+    }
+
+    func testBrandM4UnknownProviderErrorDoesNotLeakTokenOrRawMessage() {
+        struct SensitiveError: LocalizedError {
+            var errorDescription: String? { "Bearer super-secret-token 客户原文" }
+        }
+        let message = BrandPlatformAutomationService.safeErrorMessage(SensitiveError())
+        XCTAssertFalse(message.contains("super-secret-token"))
+        XCTAssertFalse(message.contains("客户原文"))
+        XCTAssertTrue(message.contains("原有数据"))
+    }
+
+    func testBrandM4ExperimentUsesOnlyConfirmedSnapshots() {
+        let firstID = UUID()
+        let secondID = UUID()
+        let experiment = BrandExperiment(
+            title: "标题测试",
+            dimension: .titleDirection,
+            hypothesis: "问题标题互动更多",
+            variantALabel: "陈述",
+            variantAPublishRecordID: firstID,
+            variantBLabel: "问题",
+            variantBPublishRecordID: secondID
+        )
+        let confirmed = BrandMetricSnapshot(
+            publishRecordID: firstID,
+            periodStart: .now.addingTimeInterval(-3_600),
+            periodEnd: .now,
+            method: .manual,
+            views: 100,
+            likes: 10,
+            isConfirmed: true
+        )
+        let unconfirmed = BrandMetricSnapshot(
+            publishRecordID: secondID,
+            periodStart: .now.addingTimeInterval(-3_600),
+            periodEnd: .now,
+            method: .manual,
+            views: 999,
+            likes: 999,
+            isConfirmed: false
+        )
+        let result = BrandPlatformAutomationService.factualComparison(experiment: experiment, snapshots: [confirmed, unconfirmed])
+        XCTAssertTrue(result.contains("数据不足"))
+        XCTAssertFalse(result.contains("999"))
+    }
+
+    @MainActor
+    func testBrandM4BackupContainsConnectionMetadataButNoCredentialSecret() throws {
+        let schema = Schema([
+            Client.self, ServiceItem.self, Appointment.self, ConsentRecord.self, ConsultationRecord.self,
+            MediaAsset.self, PaymentTransaction.self, ServiceOrder.self, OrderPaymentTransaction.self,
+            EntitlementRedemption.self, ServiceOrderChange.self, ConsultationActivity.self,
+            ConsultationSummaryRevision.self, BrandProfile.self, BrandContentTopic.self, BrandDraft.self,
+            BrandDraftRevision.self, BrandPublishRecord.self, BrandAsset.self, BrandMetricSnapshot.self,
+            BrandWeeklyReview.self, BrandMarketingTouchpoint.self, BrandAssetAuditEvent.self,
+            BrandAssetUsage.self, BrandAssetActionTask.self, BrandPlatformConnection.self,
+            BrandSyncRun.self, BrandSyncItemReceipt.self, BrandExperiment.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let context = container.mainContext
+        let connection = BrandPlatformConnection(
+            platform: .xiaohongshuOpenAccount,
+            accountLabel: "备份测试账号",
+            accountType: "开放账号",
+            capability: .basicIdentityOnly,
+            status: .manualOnly,
+            officialDocumentURL: "https://openaccount.xiaohongshu.com/docs/quick-start",
+            verificationNote: "只备份非敏感元数据",
+            credentialStoredAt: .now,
+            tokenExpiresAt: .now.addingTimeInterval(7_200)
+        )
+        context.insert(connection)
+        try context.save()
+        let snapshot = try BackupService.captureSnapshot(context: context)
+        let encoded = try JSONEncoder().encode(snapshot)
+        let text = String(decoding: encoded, as: UTF8.self)
+        XCTAssertEqual(snapshot.brandPlatformConnections?.count, 1)
+        XCTAssertFalse(text.contains("accessToken"))
+        XCTAssertFalse(text.contains("refreshToken"))
+        XCTAssertFalse(text.contains("super-secret-token"))
     }
 }

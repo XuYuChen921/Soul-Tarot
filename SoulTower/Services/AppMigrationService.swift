@@ -7,7 +7,7 @@ private struct AppMigrationState: Codable {
 }
 
 enum AppMigrationService {
-    static let currentVersion = 10
+    static let currentVersion = 11
 
     @MainActor
     static func run(context: ModelContext) throws -> String {
@@ -68,6 +68,12 @@ enum AppMigrationService {
             state.version = 10
             state.updatedAt = .now
             completedSteps.append("品牌素材、匿名授权与撤回闭环接入")
+        }
+        if state.version < 11 {
+            try BrandPlatformCapabilityRegistry.registerDefaults(context: context)
+            state.version = 11
+            state.updatedAt = .now
+            completedSteps.append("平台能力、同步恢复与优化实验接入")
         }
         if !completedSteps.isEmpty {
             try saveState(state)

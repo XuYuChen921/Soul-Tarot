@@ -60,6 +60,10 @@ enum BackupService {
             brandAssetAudits: try context.fetch(FetchDescriptor<BrandAssetAuditEvent>()).map(BackupBrandAssetAudit.init),
             brandAssetUsages: try context.fetch(FetchDescriptor<BrandAssetUsage>()).map(BackupBrandAssetUsage.init),
             brandAssetTasks: try context.fetch(FetchDescriptor<BrandAssetActionTask>()).map(BackupBrandAssetTask.init),
+            brandPlatformConnections: try context.fetch(FetchDescriptor<BrandPlatformConnection>()).map(BackupBrandPlatformConnection.init),
+            brandSyncRuns: try context.fetch(FetchDescriptor<BrandSyncRun>()).map(BackupBrandSyncRun.init),
+            brandSyncReceipts: try context.fetch(FetchDescriptor<BrandSyncItemReceipt>()).map(BackupBrandSyncReceipt.init),
+            brandExperiments: try context.fetch(FetchDescriptor<BrandExperiment>()).map(BackupBrandExperiment.init),
             brandFiles: []
         )
     }
@@ -361,6 +365,10 @@ enum BackupService {
         let existingAppointments = try context.fetch(FetchDescriptor<Appointment>())
         existingAppointments.forEach(NotificationScheduler.cancel)
 
+        try context.fetch(FetchDescriptor<BrandExperiment>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandSyncItemReceipt>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandSyncRun>()).forEach(context.delete)
+        try context.fetch(FetchDescriptor<BrandPlatformConnection>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<BrandAssetActionTask>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<BrandAssetUsage>()).forEach(context.delete)
         try context.fetch(FetchDescriptor<BrandAssetAuditEvent>()).forEach(context.delete)
@@ -417,6 +425,10 @@ enum BackupService {
         (snapshot.brandAssetAudits ?? []).map { $0.model() }.forEach(context.insert)
         (snapshot.brandAssetUsages ?? []).map { $0.model() }.forEach(context.insert)
         (snapshot.brandAssetTasks ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandPlatformConnections ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandSyncRuns ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandSyncReceipts ?? []).map { $0.model() }.forEach(context.insert)
+        (snapshot.brandExperiments ?? []).map { $0.model() }.forEach(context.insert)
         try context.save()
     }
 

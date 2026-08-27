@@ -194,4 +194,27 @@ final class BusinessFlowMacUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    func testMacBrandM4ShowsVerifiedAutomationBoundariesAndExperiments() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launchArguments.append("--ui-testing-brand-m4")
+        app.launch()
+
+        let brandEntry = app.staticTexts["品牌增长"].firstMatch
+        XCTAssertTrue(brandEntry.waitForExistence(timeout: 5))
+        brandEntry.tap()
+
+        XCTAssertTrue(app.radioButtons["平台自动化"].waitForExistence(timeout: 5))
+        app.radioButtons["平台自动化"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m4-boundary"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m4-connections"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["个人微信朋友圈"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["M4 测试：标题方向对比"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Mac 品牌增长 M4 平台自动化"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

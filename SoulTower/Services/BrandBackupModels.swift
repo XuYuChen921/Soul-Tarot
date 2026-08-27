@@ -216,6 +216,130 @@ struct BackupBrandMetricSnapshot: Codable, Sendable {
     }
 }
 
+struct BackupBrandPlatformConnection: Codable, Sendable {
+    var id: UUID; var platformRaw: String; var accountLabel: String; var accountType: String
+    var capabilityRaw: String; var statusRaw: String; var officialDocumentURL: String; var verificationNote: String
+    var isAPIApproved: Bool; var credentialStoredAt: Date?; var tokenExpiresAt: Date?
+    var lastAttemptAt: Date?; var lastSuccessfulSyncAt: Date?; var lastErrorCategory: String; var lastErrorMessage: String
+    var createdAt: Date; var updatedAt: Date
+
+    init(_ value: BrandPlatformConnection) {
+        id = value.id; platformRaw = value.platformRaw; accountLabel = value.accountLabel; accountType = value.accountType
+        capabilityRaw = value.capabilityRaw; statusRaw = value.statusRaw
+        officialDocumentURL = value.officialDocumentURL; verificationNote = value.verificationNote
+        isAPIApproved = value.isAPIApproved; credentialStoredAt = value.credentialStoredAt; tokenExpiresAt = value.tokenExpiresAt
+        lastAttemptAt = value.lastAttemptAt; lastSuccessfulSyncAt = value.lastSuccessfulSyncAt
+        lastErrorCategory = value.lastErrorCategory; lastErrorMessage = value.lastErrorMessage
+        createdAt = value.createdAt; updatedAt = value.updatedAt
+    }
+
+    func model() -> BrandPlatformConnection {
+        BrandPlatformConnection(
+            id: id,
+            platform: BrandPlatformKind(rawValue: platformRaw) ?? .wechatPersonalMoments,
+            accountLabel: accountLabel,
+            accountType: accountType,
+            capability: BrandPlatformCapability(rawValue: capabilityRaw) ?? .manualImportOnly,
+            status: BrandPlatformConnectionStatus(rawValue: statusRaw) ?? .manualOnly,
+            officialDocumentURL: officialDocumentURL,
+            verificationNote: verificationNote,
+            isAPIApproved: isAPIApproved,
+            credentialStoredAt: nil,
+            tokenExpiresAt: nil,
+            lastAttemptAt: lastAttemptAt,
+            lastSuccessfulSyncAt: lastSuccessfulSyncAt,
+            lastErrorCategory: lastErrorCategory,
+            lastErrorMessage: lastErrorMessage,
+            createdAt: createdAt,
+            updatedAt: updatedAt
+        )
+    }
+}
+
+struct BackupBrandSyncRun: Codable, Sendable {
+    var id: UUID; var connectionID: UUID; var statusRaw: String; var requestedAt: Date; var completedAt: Date?
+    var importedCount: Int; var skippedDuplicateCount: Int; var errorCategory: String; var safeMessage: String
+
+    init(_ value: BrandSyncRun) {
+        id = value.id; connectionID = value.connectionID; statusRaw = value.statusRaw
+        requestedAt = value.requestedAt; completedAt = value.completedAt
+        importedCount = value.importedCount; skippedDuplicateCount = value.skippedDuplicateCount
+        errorCategory = value.errorCategory; safeMessage = value.safeMessage
+    }
+
+    func model() -> BrandSyncRun {
+        BrandSyncRun(
+            id: id,
+            connectionID: connectionID,
+            status: BrandSyncRunStatus(rawValue: statusRaw) ?? .failed,
+            requestedAt: requestedAt,
+            completedAt: completedAt,
+            importedCount: importedCount,
+            skippedDuplicateCount: skippedDuplicateCount,
+            errorCategory: errorCategory,
+            safeMessage: safeMessage
+        )
+    }
+}
+
+struct BackupBrandSyncReceipt: Codable, Sendable {
+    var id: UUID; var fingerprint: String; var connectionID: UUID; var remoteItemID: String
+    var publishRecordID: UUID; var metricSnapshotID: UUID; var receivedAt: Date
+
+    init(_ value: BrandSyncItemReceipt) {
+        id = value.id; fingerprint = value.fingerprint; connectionID = value.connectionID
+        remoteItemID = value.remoteItemID; publishRecordID = value.publishRecordID
+        metricSnapshotID = value.metricSnapshotID; receivedAt = value.receivedAt
+    }
+
+    func model() -> BrandSyncItemReceipt {
+        BrandSyncItemReceipt(
+            id: id,
+            fingerprint: fingerprint,
+            connectionID: connectionID,
+            remoteItemID: remoteItemID,
+            publishRecordID: publishRecordID,
+            metricSnapshotID: metricSnapshotID,
+            receivedAt: receivedAt
+        )
+    }
+}
+
+struct BackupBrandExperiment: Codable, Sendable {
+    var id: UUID; var title: String; var dimensionRaw: String; var hypothesis: String
+    var variantALabel: String; var variantAPublishRecordID: UUID; var variantBLabel: String; var variantBPublishRecordID: UUID
+    var statusRaw: String; var factualComparison: String; var conclusion: String
+    var startedAt: Date; var endedAt: Date?; var createdAt: Date; var updatedAt: Date
+
+    init(_ value: BrandExperiment) {
+        id = value.id; title = value.title; dimensionRaw = value.dimensionRaw; hypothesis = value.hypothesis
+        variantALabel = value.variantALabel; variantAPublishRecordID = value.variantAPublishRecordID
+        variantBLabel = value.variantBLabel; variantBPublishRecordID = value.variantBPublishRecordID
+        statusRaw = value.statusRaw; factualComparison = value.factualComparison; conclusion = value.conclusion
+        startedAt = value.startedAt; endedAt = value.endedAt; createdAt = value.createdAt; updatedAt = value.updatedAt
+    }
+
+    func model() -> BrandExperiment {
+        BrandExperiment(
+            id: id,
+            title: title,
+            dimension: BrandExperimentDimension(rawValue: dimensionRaw) ?? .titleDirection,
+            hypothesis: hypothesis,
+            variantALabel: variantALabel,
+            variantAPublishRecordID: variantAPublishRecordID,
+            variantBLabel: variantBLabel,
+            variantBPublishRecordID: variantBPublishRecordID,
+            status: BrandExperimentStatus(rawValue: statusRaw) ?? .planned,
+            factualComparison: factualComparison,
+            conclusion: conclusion,
+            startedAt: startedAt,
+            endedAt: endedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt
+        )
+    }
+}
+
 struct BackupBrandWeeklyReview: Codable, Sendable {
     var id: UUID; var periodStart: Date; var periodEnd: Date; var plannedGenerateAt: Date; var generatedAt: Date?
     var summaryText: String; var conclusionText: String; var bestText: String; var worstText: String

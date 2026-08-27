@@ -236,4 +236,30 @@ final class BusinessFlowUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    func testPhoneBrandM4ShowsVerifiedAutomationBoundariesAndExperiments() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launchArguments.append("--ui-testing-brand-m4")
+        app.launch()
+
+        XCTAssertTrue(app.tabBars.buttons["更多"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["更多"].tap()
+        app.staticTexts["品牌增长"].firstMatch.tap()
+
+        let pagePicker = app.descendants(matching: .any)["brand-page-picker"]
+        XCTAssertTrue(pagePicker.waitForExistence(timeout: 5))
+        pagePicker.tap()
+        XCTAssertTrue(app.buttons["平台自动化"].waitForExistence(timeout: 5))
+        app.buttons["平台自动化"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m4-boundary"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-m4-connections"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["个人微信朋友圈"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["M4 测试：标题方向对比"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "iPhone 品牌增长 M4 平台自动化"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

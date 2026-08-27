@@ -9,6 +9,7 @@ private enum BrandGrowthPage: String, CaseIterable, Identifiable {
     case attribution = "询盘归因"
     case weeklyReview = "每周复盘"
     case assets = "素材授权"
+    case automation = "平台自动化"
     case settings = "品牌设置"
 
     var id: String { rawValue }
@@ -91,6 +92,8 @@ struct BrandGrowthView: View {
                         BrandWeeklyReviewPage()
                     case .assets:
                         BrandAssetLibraryPage()
+                    case .automation:
+                        BrandPlatformAutomationPage()
                     case .settings:
                         settingsPage
                     }

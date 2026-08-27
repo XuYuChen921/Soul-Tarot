@@ -440,6 +440,118 @@ enum SeedService {
         ))
         try context.save()
     }
+
+    static func insertBrandM4UITestData(context: ModelContext) throws {
+        try BrandPlatformCapabilityRegistry.registerDefaults(context: context)
+        let marker = "M4 测试：标题方向对比"
+        guard !(try context.fetch(FetchDescriptor<BrandExperiment>())).contains(where: { $0.title == marker }) else { return }
+        guard let profile = try context.fetch(FetchDescriptor<BrandProfile>()).first else { return }
+
+        let firstTopic = BrandContentTopic(
+            profileID: profile.id,
+            title: "M4 测试：温和标题",
+            rawIdea: "虚构内容：用三句话记录今天的感受。",
+            targetAudience: "界面验证人群",
+            pillar: "成长练习",
+            goal: .interaction,
+            sourceType: .personalOpinion,
+            sensitivity: "公开测试内容",
+            customerReference: "",
+            actionHint: "收藏练习",
+            priority: 1,
+            status: .completed
+        )
+        let secondTopic = BrandContentTopic(
+            profileID: profile.id,
+            title: "M4 测试：问题标题",
+            rawIdea: "虚构内容：你会怎样描述今天的感受？",
+            targetAudience: "界面验证人群",
+            pillar: "成长练习",
+            goal: .interaction,
+            sourceType: .personalOpinion,
+            sensitivity: "公开测试内容",
+            customerReference: "",
+            actionHint: "留言练习",
+            priority: 1,
+            status: .completed
+        )
+        context.insert(firstTopic)
+        context.insert(secondTopic)
+        let firstRecord = BrandPublishRecord(
+            topicID: firstTopic.id,
+            channel: .wechatMoments,
+            publishedAt: .now.addingTimeInterval(-172_800),
+            platformPostID: "UI-M4-A",
+            note: "虚构 M4 对比内容",
+            snapshotTitle: firstTopic.title,
+            snapshotContent: firstTopic.rawIdea,
+            publishedAsApproved: true,
+            collectedBy: "自动界面测试"
+        )
+        let secondRecord = BrandPublishRecord(
+            topicID: secondTopic.id,
+            channel: .wechatMoments,
+            publishedAt: .now.addingTimeInterval(-86_400),
+            platformPostID: "UI-M4-B",
+            note: "虚构 M4 对比内容",
+            snapshotTitle: secondTopic.title,
+            snapshotContent: secondTopic.rawIdea,
+            publishedAsApproved: true,
+            collectedBy: "自动界面测试"
+        )
+        context.insert(firstRecord)
+        context.insert(secondRecord)
+        context.insert(BrandMetricSnapshot(
+            publishRecordID: firstRecord.id,
+            periodStart: .now.addingTimeInterval(-172_800),
+            periodEnd: .now,
+            method: .manual,
+            views: 120,
+            likes: 15,
+            comments: 3,
+            favorites: 4,
+            shares: 2,
+            missingReasons: "曝光未提供",
+            sourceFile: "M4 虚构人工快照",
+            isConfirmed: true
+        ))
+        context.insert(BrandMetricSnapshot(
+            publishRecordID: secondRecord.id,
+            periodStart: .now.addingTimeInterval(-86_400),
+            periodEnd: .now,
+            method: .manual,
+            views: 150,
+            likes: 17,
+            comments: 6,
+            favorites: 5,
+            shares: 1,
+            missingReasons: "曝光未提供",
+            sourceFile: "M4 虚构人工快照",
+            isConfirmed: true
+        ))
+        let experiment = BrandExperiment(
+            title: marker,
+            dimension: .titleDirection,
+            hypothesis: "问题式标题可能带来更多互动。",
+            variantALabel: "温和陈述",
+            variantAPublishRecordID: firstRecord.id,
+            variantBLabel: "问题引导",
+            variantBPublishRecordID: secondRecord.id,
+            status: .running
+        )
+        context.insert(experiment)
+        if let wechat = try context.fetch(FetchDescriptor<BrandPlatformConnection>()).first(where: { $0.platform == .wechatPersonalMoments }) {
+            context.insert(BrandSyncRun(
+                connectionID: wechat.id,
+                status: .skipped,
+                requestedAt: .now.addingTimeInterval(-3_600),
+                completedAt: .now.addingTimeInterval(-3_599),
+                errorCategory: "capability_unavailable",
+                safeMessage: "个人朋友圈未开放已核验的官方指标同步，人工流程保持可用。"
+            ))
+        }
+        try context.save()
+    }
     #endif
 
     private static var defaultServices: [ServiceItem] {
