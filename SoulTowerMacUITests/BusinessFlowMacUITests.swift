@@ -142,4 +142,32 @@ final class BusinessFlowMacUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    func testMacBrandM2ShowsDataAttributionAndWeeklyReview() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launchArguments.append("--ui-testing-brand-m2")
+        app.launch()
+
+        let brandEntry = app.staticTexts["品牌增长"].firstMatch
+        XCTAssertTrue(brandEntry.waitForExistence(timeout: 5))
+        brandEntry.tap()
+
+        XCTAssertTrue(app.radioButtons["数据中心"].waitForExistence(timeout: 5))
+        app.radioButtons["数据中心"].tap()
+        XCTAssertTrue(app.staticTexts["数据采集原则"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["新增快照"].waitForExistence(timeout: 5))
+
+        app.radioButtons["询盘归因"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["brand-attribution-evidence-list"].waitForExistence(timeout: 5))
+
+        app.radioButtons["每周复盘"].tap()
+        XCTAssertTrue(app.staticTexts["每周复盘"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-weekly-review-row"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Mac 品牌增长 M2 闭环"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

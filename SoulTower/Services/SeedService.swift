@@ -200,6 +200,142 @@ enum SeedService {
         ))
         try context.save()
     }
+
+    static func insertBrandM2UITestData(context: ModelContext) throws {
+        let clientCode = "C-UI-M2"
+        guard !((try context.fetch(FetchDescriptor<Client>())).contains { $0.clientCode == clientCode }) else { return }
+        guard let service = try context.fetch(FetchDescriptor<ServiceItem>(sortBy: [SortDescriptor(\.sortOrder)])).first,
+              let profile = try context.fetch(FetchDescriptor<BrandProfile>()).first else { return }
+
+        let week = BrandGrowthAnalyticsService.naturalWeek(containing: .now)
+        let publishedAt = max(week.start.addingTimeInterval(3_600), Date.now.addingTimeInterval(-86_400))
+        let topic = BrandContentTopic(
+            profileID: profile.id,
+            title: "测试内容：边界练习",
+            rawIdea: "把事实、感受和请求分开记录。全部为虚构测试内容。",
+            targetAudience: "界面验证人群",
+            pillar: "心理成长练习",
+            goal: .inquiry,
+            sourceType: .personalOpinion,
+            sensitivity: "公开测试内容",
+            customerReference: "",
+            actionHint: "保存练习清单",
+            priority: 1,
+            status: .completed
+        )
+        context.insert(topic)
+        let publishRecord = BrandPublishRecord(
+            topicID: topic.id,
+            channel: .wechatMoments,
+            publishedAt: publishedAt,
+            platformPostID: "UI-M2-POST-001",
+            note: "自动界面测试虚构发布记录",
+            snapshotTitle: topic.title,
+            snapshotContent: topic.rawIdea,
+            publishedAsApproved: true,
+            collectedBy: "自动界面测试"
+        )
+        context.insert(publishRecord)
+        let snapshot = BrandMetricSnapshot(
+            publishRecordID: publishRecord.id,
+            collectedAt: .now,
+            periodStart: publishedAt,
+            periodEnd: .now.addingTimeInterval(1),
+            method: .manual,
+            exposure: 320,
+            views: 180,
+            likes: 21,
+            comments: 4,
+            favorites: 12,
+            shares: 3,
+            profileVisits: 8,
+            followers: nil,
+            privateMessages: 1,
+            missingReasons: "平台未提供新增关注",
+            sourceFile: "自动界面测试",
+            isConfirmed: true
+        )
+        context.insert(snapshot)
+
+        let client = Client(
+            clientCode: clientCode,
+            displayName: "品牌归因测试客户",
+            source: "自动界面测试",
+            notes: "仅用于 M2 临时界面验证的虚构客户"
+        )
+        context.insert(client)
+        let appointment = Appointment(
+            clientID: client.id,
+            clientCode: client.clientCode,
+            clientNameSnapshot: client.displayName,
+            serviceID: service.id,
+            serviceNameSnapshot: service.name,
+            startAt: min(Date.now, week.end.addingTimeInterval(-3_600)),
+            endAt: min(Date.now, week.end.addingTimeInterval(-3_600)).addingTimeInterval(3_600),
+            status: .completed,
+            paymentStatus: .paid,
+            priceCents: 66_600,
+            policyVersion: DefaultBusinessRules.policyVersion,
+            notes: "M2 自动界面测试预约"
+        )
+        context.insert(appointment)
+        let payment = PaymentTransaction(
+            appointmentID: appointment.id,
+            clientID: client.id,
+            clientCode: client.clientCode,
+            serviceNameSnapshot: service.name,
+            kind: .servicePayment,
+            method: .wechat,
+            amountCents: 66_600,
+            occurredAt: min(Date.now, week.end.addingTimeInterval(-1_800)),
+            note: "M2 自动界面测试虚构实收"
+        )
+        context.insert(payment)
+        let touchpoint = BrandMarketingTouchpoint(
+            clientID: client.id,
+            clientCodeSnapshot: client.clientCode,
+            clientNameSnapshot: client.displayName,
+            channel: .wechatMoments,
+            publishRecordID: publishRecord.id,
+            keyword: "边界练习",
+            firstContactAt: min(Date.now, week.end.addingTimeInterval(-7_200)),
+            evidence: .confirmedContent,
+            confirmationMethod: "自动界面测试：客户主动说明",
+            note: "全部为虚构数据"
+        )
+        context.insert(touchpoint)
+
+        let draft = BrandGrowthAnalyticsService.makeWeeklyReview(
+            interval: week,
+            publishRecords: [publishRecord],
+            snapshots: [snapshot],
+            touchpoints: [touchpoint],
+            appointments: [appointment],
+            orders: [],
+            appointmentPayments: [payment],
+            orderPayments: []
+        )
+        let review = BrandWeeklyReview(
+            periodStart: draft.periodStart,
+            periodEnd: draft.periodEnd,
+            plannedGenerateAt: draft.plannedGenerateAt,
+            generatedAt: draft.generatedAt,
+            summaryText: draft.facts,
+            conclusionText: draft.interpretation,
+            bestText: draft.best,
+            worstText: draft.worst,
+            conversionText: draft.conversion,
+            channelWechatRole: draft.wechatRole,
+            channelXhsRole: draft.xiaohongshuRole,
+            dataGapText: draft.dataGaps,
+            continueText: draft.continueDoing,
+            stopText: draft.stopDoing,
+            experimentText: draft.experiments,
+            usedSnapshotIDsText: draft.usedSnapshotIDs.map(\.uuidString).joined(separator: "\n")
+        )
+        context.insert(review)
+        try context.save()
+    }
     #endif
 
     private static var defaultServices: [ServiceItem] {

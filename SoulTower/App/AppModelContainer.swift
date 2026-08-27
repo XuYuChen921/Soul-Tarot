@@ -34,7 +34,8 @@ enum AppModelContainer {
             BrandPublishRecord.self,
             BrandAsset.self,
             BrandMetricSnapshot.self,
-            BrandWeeklyReview.self
+            BrandWeeklyReview.self,
+            BrandMarketingTouchpoint.self
         ])
         let configuration = ModelConfiguration(
             "SoulTower",

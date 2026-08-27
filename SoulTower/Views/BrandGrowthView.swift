@@ -5,6 +5,9 @@ private enum BrandGrowthPage: String, CaseIterable, Identifiable {
     case overview = "品牌首页"
     case content = "内容工作台"
     case calendar = "发布日历"
+    case data = "数据中心"
+    case attribution = "询盘归因"
+    case weeklyReview = "每周复盘"
     case settings = "品牌设置"
 
     var id: String { rawValue }
@@ -18,6 +21,12 @@ struct BrandGrowthView: View {
     @Query(sort: \BrandDraft.updatedAt, order: .reverse) private var drafts: [BrandDraft]
     @Query(sort: \BrandDraftRevision.savedAt, order: .reverse) private var revisions: [BrandDraftRevision]
     @Query(sort: \BrandPublishRecord.createdAt, order: .reverse) private var publishRecords: [BrandPublishRecord]
+    @Query(sort: \BrandMetricSnapshot.collectedAt, order: .reverse) private var metricSnapshots: [BrandMetricSnapshot]
+    @Query private var touchpoints: [BrandMarketingTouchpoint]
+    @Query private var appointments: [Appointment]
+    @Query private var serviceOrders: [ServiceOrder]
+    @Query private var appointmentPayments: [PaymentTransaction]
+    @Query private var orderPayments: [OrderPaymentTransaction]
 
     @State private var page: BrandGrowthPage = .overview
     @State private var selectedTopicID: UUID?
@@ -47,12 +56,22 @@ struct BrandGrowthView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     header
+                    #if os(macOS)
                     Picker("品牌增长页面", selection: $page) {
                         ForEach(BrandGrowthPage.allCases) { item in
                             Text(item.rawValue).tag(item)
                         }
                     }
                     .pickerStyle(.segmented)
+                    #else
+                    Picker("当前页面", selection: $page) {
+                        ForEach(BrandGrowthPage.allCases) { item in
+                            Text(item.rawValue).tag(item)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .accessibilityIdentifier("brand-page-picker")
+                    #endif
 
                     switch page {
                     case .overview:
@@ -61,6 +80,12 @@ struct BrandGrowthView: View {
                         contentPage
                     case .calendar:
                         calendarPage
+                    case .data:
+                        BrandDataCenterPage()
+                    case .attribution:
+                        BrandAttributionPage()
+                    case .weeklyReview:
+                        BrandWeeklyReviewPage()
                     case .settings:
                         settingsPage
                     }
@@ -129,7 +154,18 @@ struct BrandGrowthView: View {
                 metricCard("进行中选题", value: topics.filter { !$0.isArchived && $0.status != .completed }.count, icon: "lightbulb.fill", tint: BrandTheme.gold)
                 metricCard("待人工审批", value: drafts.filter { $0.status == .waitingApproval }.count, icon: "person.crop.circle.badge.checkmark", tint: .orange)
                 metricCard("已批准待安排", value: approvedUnscheduledCount, icon: "calendar.badge.plus", tint: BrandTheme.teal)
-                metricCard("已登记发布", value: publishRecords.filter(\.isPublished).count, icon: "checkmark.seal.fill", tint: .green)
+                metricCard("待补平台数据", value: publishedWithoutConfirmedSnapshotCount, icon: "chart.bar.doc.horizontal", tint: .orange)
+                metricCard("本周询盘", value: currentWeekAttribution.inquiryCount, icon: "bubble.left.and.bubble.right.fill", tint: BrandTheme.teal)
+                metricCard("本周归因预约", value: currentWeekAttribution.appointmentCount, icon: "calendar.badge.checkmark", tint: .green)
+                metricCard("本周归因成交", value: currentWeekAttribution.orderCount, icon: "shippingbox.fill", tint: .green)
+            }
+
+            sectionCard(title: "本周品牌现金结果", icon: "banknote.fill") {
+                Text(currentWeekAttribution.netCashCents.yuanText)
+                    .font(.largeTitle.bold().monospacedDigit())
+                    .foregroundStyle(BrandTheme.teal)
+                Text("仅计算已确认到具体内容的客户，并读取现有预约/订单真实流水；未确认来源不计入。")
+                    .font(.footnote).foregroundStyle(.secondary)
             }
 
             sectionCard(title: "本周工作重点", icon: "checklist") {
@@ -161,6 +197,7 @@ struct BrandGrowthView: View {
             sectionCard(title: "首阶段边界", icon: "shield.lefthalf.filled") {
                 Label("只使用个人观点、公开资料和品牌自有素材", systemImage: "checkmark.circle.fill")
                 Label("AI 草稿必须逐平台人工批准，系统不自动发布", systemImage: "checkmark.circle.fill")
+                Label("数据快照只新增不覆盖，缺失值不补 0；归因必须有人工证据", systemImage: "checkmark.circle.fill")
                 Label("客户案例、私聊监控、非官方爬取和无人审核发布均未启用", systemImage: "nosign")
                     .foregroundStyle(.secondary)
             }
@@ -378,6 +415,23 @@ struct BrandGrowthView: View {
         drafts.filter { draft in
             draft.isApproved && !publishRecords.contains(where: { $0.draftID == draft.id })
         }.count
+    }
+
+    private var publishedWithoutConfirmedSnapshotCount: Int {
+        publishRecords.filter(\.isPublished).filter { record in
+            !metricSnapshots.contains { $0.publishRecordID == record.id && $0.isConfirmed }
+        }.count
+    }
+
+    private var currentWeekAttribution: BrandAttributionSummary {
+        BrandGrowthAnalyticsService.attributionSummary(
+            touchpoints: touchpoints,
+            appointments: appointments,
+            orders: serviceOrders,
+            appointmentPayments: appointmentPayments,
+            orderPayments: orderPayments,
+            interval: BrandGrowthAnalyticsService.naturalWeek(containing: .now)
+        )
     }
 
     private func metricCard(_ title: String, value: Int, icon: String, tint: Color) -> some View {

@@ -179,4 +179,36 @@ final class BusinessFlowUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    func testPhoneBrandM2CanViewDataAndWeeklyReview() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launchArguments.append("--ui-testing-brand-m2")
+        app.launch()
+
+        XCTAssertTrue(app.tabBars.buttons["更多"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["更多"].tap()
+        let brandEntry = app.staticTexts["品牌增长"].firstMatch
+        XCTAssertTrue(brandEntry.waitForExistence(timeout: 5))
+        brandEntry.tap()
+
+        let pagePicker = app.descendants(matching: .any)["brand-page-picker"]
+        XCTAssertTrue(pagePicker.waitForExistence(timeout: 5))
+        pagePicker.tap()
+        XCTAssertTrue(app.buttons["数据中心"].waitForExistence(timeout: 5))
+        app.buttons["数据中心"].tap()
+        XCTAssertTrue(app.staticTexts["数据采集原则"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["新增快照"].waitForExistence(timeout: 5))
+
+        app.descendants(matching: .any)["brand-page-picker"].tap()
+        XCTAssertTrue(app.buttons["每周复盘"].waitForExistence(timeout: 5))
+        app.buttons["每周复盘"].tap()
+        XCTAssertTrue(app.staticTexts["每周复盘"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["brand-weekly-review-row"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "iPhone 品牌增长 M2 周复盘"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

@@ -1264,4 +1264,320 @@ final class BusinessRulesTests: XCTestCase {
         XCTAssertFalse(result.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         XCTAssertFalse(result.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
+
+    func testBrandMetricImportMapsFieldsAndKeepsMissingValuesNil() throws {
+        let record = BrandPublishRecord(
+            topicID: UUID(),
+            channel: .xiaohongshu,
+            publishedAt: Date(timeIntervalSince1970: 1_788_000_000),
+            platformPostID: "XHS-TEST-001",
+            snapshotTitle: "测试内容"
+        )
+        let csv = """
+        发布记录标识,采集时间,覆盖开始,覆盖结束,曝光,阅读,点赞,评论,收藏,分享,主页访问,新增关注,私信,缺失说明
+        XHS-TEST-001,2026-08-26 12:00,2026-08-25,2026-08-26,,120,0,3,8,2,,,1,平台未提供曝光与主页数据
+        """
+
+        let preview = try BrandMetricImportService.preview(text: csv)
+        let snapshots = try BrandMetricImportService.makeSnapshots(
+            from: preview,
+            publishRecords: [record],
+            sourceFile: "测试导入.csv"
+        )
+
+        XCTAssertEqual(snapshots.count, 1)
+        XCTAssertNil(snapshots[0].exposure)
+        XCTAssertEqual(snapshots[0].views, 120)
+        XCTAssertEqual(snapshots[0].likes, 0)
+        XCTAssertEqual(snapshots[0].privateMessages, 1)
+        XCTAssertEqual(snapshots[0].method, .csv)
+        XCTAssertTrue(snapshots[0].isConfirmed)
+    }
+
+    func testBrandLatestSnapshotUsesNewestConfirmedVersionWithoutOverwritingHistory() {
+        let recordID = UUID()
+        let periodStart = Date(timeIntervalSince1970: 1_788_000_000)
+        let periodEnd = periodStart.addingTimeInterval(86_400)
+        let first = BrandMetricSnapshot(
+            publishRecordID: recordID,
+            collectedAt: periodEnd,
+            periodStart: periodStart,
+            periodEnd: periodEnd,
+            method: .manual,
+            views: 10,
+            isConfirmed: true
+        )
+        let second = BrandMetricSnapshot(
+            publishRecordID: recordID,
+            collectedAt: periodEnd.addingTimeInterval(60),
+            periodStart: periodStart,
+            periodEnd: periodEnd,
+            method: .manual,
+            views: 20,
+            isConfirmed: true
+        )
+        let unconfirmed = BrandMetricSnapshot(
+            publishRecordID: recordID,
+            collectedAt: periodEnd.addingTimeInterval(120),
+            periodStart: periodStart,
+            periodEnd: periodEnd,
+            method: .manual,
+            views: 999,
+            isConfirmed: false
+        )
+
+        let latest = BrandGrowthAnalyticsService.latestConfirmedSnapshots([first, second, unconfirmed])
+
+        XCTAssertEqual(latest.count, 1)
+        XCTAssertEqual(latest[0].id, second.id)
+        XCTAssertEqual(first.views, 10)
+        XCTAssertEqual(second.views, 20)
+    }
+
+    func testBrandAttributionReadsOnlyConfirmedContentAndRealCashLedger() {
+        let start = Date(timeIntervalSince1970: 1_788_134_400)
+        let interval = DateInterval(start: start, end: start.addingTimeInterval(7 * 86_400))
+        let clientID = UUID()
+        let postID = UUID()
+        let appointmentID = UUID()
+        let orderID = UUID()
+        let serviceID = UUID()
+        let touchpoint = BrandMarketingTouchpoint(
+            clientID: clientID,
+            clientCodeSnapshot: "C-M2-001",
+            clientNameSnapshot: "测试客户",
+            channel: .wechatMoments,
+            publishRecordID: postID,
+            keyword: "边界练习",
+            firstContactAt: start.addingTimeInterval(3_600),
+            evidence: .confirmedContent,
+            confirmationMethod: "客户主动说明"
+        )
+        let platformOnlyClientID = UUID()
+        let platformOnly = BrandMarketingTouchpoint(
+            clientID: platformOnlyClientID,
+            clientCodeSnapshot: "C-M2-002",
+            clientNameSnapshot: "平台线索客户",
+            channel: .xiaohongshu,
+            firstContactAt: start.addingTimeInterval(7_200),
+            evidence: .platformOnly,
+            confirmationMethod: "只提到平台"
+        )
+        let appointment = Appointment(
+            id: appointmentID,
+            clientID: clientID,
+            clientCode: "C-M2-001",
+            clientNameSnapshot: "测试客户",
+            serviceID: serviceID,
+            serviceNameSnapshot: "测试咨询",
+            startAt: start.addingTimeInterval(86_400),
+            endAt: start.addingTimeInterval(90_000),
+            priceCents: 10_000,
+            policyVersion: "TEST"
+        )
+        let order = ServiceOrder(
+            id: orderID,
+            clientID: clientID,
+            clientCode: "C-M2-001",
+            clientNameSnapshot: "测试客户",
+            serviceID: serviceID,
+            serviceNameSnapshot: "测试项目",
+            categorySnapshot: "测试",
+            deliveryType: .project,
+            pricingMode: .fixed,
+            totalPriceCents: 20_000,
+            status: .active,
+            paymentStatus: .paid,
+            policyVersion: "TEST",
+            placedAt: start.addingTimeInterval(2 * 86_400)
+        )
+        let appointmentPayment = PaymentTransaction(
+            appointmentID: appointmentID,
+            clientID: clientID,
+            clientCode: "C-M2-001",
+            serviceNameSnapshot: "测试咨询",
+            kind: .servicePayment,
+            method: .wechat,
+            amountCents: 10_000,
+            occurredAt: start.addingTimeInterval(2 * 86_400)
+        )
+        let orderPayment = OrderPaymentTransaction(
+            orderID: orderID,
+            clientID: clientID,
+            clientCode: "C-M2-001",
+            serviceNameSnapshot: "测试项目",
+            kind: .servicePayment,
+            method: .wechat,
+            amountCents: 20_000,
+            occurredAt: start.addingTimeInterval(3 * 86_400)
+        )
+        let refund = OrderPaymentTransaction(
+            orderID: orderID,
+            clientID: clientID,
+            clientCode: "C-M2-001",
+            serviceNameSnapshot: "测试项目",
+            kind: .refund,
+            method: .wechat,
+            amountCents: 5_000,
+            occurredAt: start.addingTimeInterval(4 * 86_400)
+        )
+        let ignoredPayment = PaymentTransaction(
+            appointmentID: UUID(),
+            clientID: platformOnlyClientID,
+            clientCode: "C-M2-002",
+            serviceNameSnapshot: "不应归因",
+            kind: .servicePayment,
+            method: .wechat,
+            amountCents: 99_999,
+            occurredAt: start.addingTimeInterval(2 * 86_400)
+        )
+
+        let result = BrandGrowthAnalyticsService.attributionSummary(
+            touchpoints: [touchpoint, platformOnly],
+            appointments: [appointment],
+            orders: [order],
+            appointmentPayments: [appointmentPayment, ignoredPayment],
+            orderPayments: [orderPayment, refund],
+            interval: interval
+        )
+
+        XCTAssertEqual(result.inquiryCount, 2)
+        XCTAssertEqual(result.contentAttributedClientCount, 1)
+        XCTAssertEqual(result.platformOnlyCount, 1)
+        XCTAssertEqual(result.appointmentCount, 1)
+        XCTAssertEqual(result.orderCount, 1)
+        XCTAssertEqual(result.netCashCents, 25_000)
+    }
+
+    func testBrandWeeklyReviewSeparatesFactsInterpretationSuggestionsAndGaps() {
+        let start = Date(timeIntervalSince1970: 1_788_134_400)
+        let interval = DateInterval(start: start, end: start.addingTimeInterval(7 * 86_400))
+        let record = BrandPublishRecord(
+            topicID: UUID(),
+            channel: .wechatMoments,
+            publishedAt: start.addingTimeInterval(3_600),
+            snapshotTitle: "测试发布内容"
+        )
+        let snapshot = BrandMetricSnapshot(
+            publishRecordID: record.id,
+            collectedAt: start.addingTimeInterval(2 * 86_400),
+            periodStart: start,
+            periodEnd: start.addingTimeInterval(2 * 86_400),
+            method: .manual,
+            views: 100,
+            likes: 8,
+            comments: 2,
+            missingReasons: "未提供曝光",
+            isConfirmed: true
+        )
+
+        let review = BrandGrowthAnalyticsService.makeWeeklyReview(
+            interval: interval,
+            publishRecords: [record],
+            snapshots: [snapshot],
+            touchpoints: [],
+            appointments: [],
+            orders: [],
+            appointmentPayments: [],
+            orderPayments: [],
+            now: interval.end
+        )
+
+        XCTAssertTrue(review.facts.contains("事实｜"))
+        XCTAssertTrue(review.interpretation.contains("解释｜"))
+        XCTAssertTrue(review.dataGaps.contains("未提供"))
+        XCTAssertEqual(review.experiments.split(separator: "\n").count, 3)
+        XCTAssertEqual(review.usedSnapshotIDs, [snapshot.id])
+    }
+
+    func testBrandNaturalWeekUsesMondayAsStartAndPlansNextMondayAtNine() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 8 * 3_600)!
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = calendar.timeZone
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let thursday = formatter.date(from: "2026-08-27 15:00")!
+
+        let week = BrandGrowthAnalyticsService.naturalWeek(containing: thursday, calendar: calendar)
+        let planned = BrandGrowthAnalyticsService.nextPlannedReview(after: thursday, calendar: calendar)
+
+        XCTAssertEqual(formatter.string(from: week.start), "2026-08-24 00:00")
+        XCTAssertEqual(formatter.string(from: week.end), "2026-08-31 00:00")
+        XCTAssertEqual(formatter.string(from: planned), "2026-08-31 09:00")
+    }
+
+    func testBrandM2TracksOnePublishedContentThroughClientAppointmentCashAndWeeklyReview() {
+        let start = Date(timeIntervalSince1970: 1_788_134_400)
+        let interval = DateInterval(start: start, end: start.addingTimeInterval(7 * 86_400))
+        let clientID = UUID()
+        let publishRecord = BrandPublishRecord(
+            topicID: UUID(),
+            channel: .wechatMoments,
+            publishedAt: start.addingTimeInterval(3_600),
+            snapshotTitle: "端到端测试内容"
+        )
+        let snapshot = BrandMetricSnapshot(
+            publishRecordID: publishRecord.id,
+            collectedAt: start.addingTimeInterval(86_400),
+            periodStart: start,
+            periodEnd: start.addingTimeInterval(86_400),
+            method: .manual,
+            views: 80,
+            likes: 6,
+            privateMessages: 1,
+            isConfirmed: true
+        )
+        let touchpoint = BrandMarketingTouchpoint(
+            clientID: clientID,
+            clientCodeSnapshot: "C-M2-E2E",
+            clientNameSnapshot: "端到端测试客户",
+            channel: .wechatMoments,
+            publishRecordID: publishRecord.id,
+            firstContactAt: start.addingTimeInterval(2 * 3_600),
+            evidence: .confirmedContent,
+            confirmationMethod: "客户主动说明"
+        )
+        let appointment = Appointment(
+            clientID: clientID,
+            clientCode: "C-M2-E2E",
+            clientNameSnapshot: "端到端测试客户",
+            serviceID: UUID(),
+            serviceNameSnapshot: "测试咨询",
+            startAt: start.addingTimeInterval(2 * 86_400),
+            endAt: start.addingTimeInterval(2 * 86_400 + 3_600),
+            status: .completed,
+            paymentStatus: .paid,
+            priceCents: 66_600,
+            policyVersion: "TEST"
+        )
+        let payment = PaymentTransaction(
+            appointmentID: appointment.id,
+            clientID: clientID,
+            clientCode: "C-M2-E2E",
+            serviceNameSnapshot: "测试咨询",
+            kind: .servicePayment,
+            method: .wechat,
+            amountCents: 66_600,
+            occurredAt: start.addingTimeInterval(2 * 86_400)
+        )
+
+        let review = BrandGrowthAnalyticsService.makeWeeklyReview(
+            interval: interval,
+            publishRecords: [publishRecord],
+            snapshots: [snapshot],
+            touchpoints: [touchpoint],
+            appointments: [appointment],
+            orders: [],
+            appointmentPayments: [payment],
+            orderPayments: []
+        )
+
+        XCTAssertTrue(review.facts.contains("实际发布 1 条"), review.facts)
+        XCTAssertTrue(review.facts.contains("确认到具体内容 1 位"), review.facts)
+        XCTAssertTrue(review.facts.contains("归因预约 1 笔"), review.facts)
+        XCTAssertTrue(review.facts.contains("¥666"), review.facts)
+        XCTAssertEqual(review.usedSnapshotIDs, [snapshot.id])
+    }
 }

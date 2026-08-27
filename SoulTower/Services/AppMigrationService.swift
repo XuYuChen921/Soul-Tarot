@@ -7,7 +7,7 @@ private struct AppMigrationState: Codable {
 }
 
 enum AppMigrationService {
-    static let currentVersion = 8
+    static let currentVersion = 9
 
     @MainActor
     static func run(context: ModelContext) throws -> String {
@@ -58,6 +58,11 @@ enum AppMigrationService {
             state.version = 8
             state.updatedAt = .now
             completedSteps.append("品牌增长初始模型接入")
+        }
+        if state.version < 9 {
+            state.version = 9
+            state.updatedAt = .now
+            completedSteps.append("品牌数据、归因与周复盘接入")
         }
         if !completedSteps.isEmpty {
             try saveState(state)

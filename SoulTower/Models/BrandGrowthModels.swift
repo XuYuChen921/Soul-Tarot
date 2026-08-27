@@ -742,6 +742,7 @@ final class BrandWeeklyReview {
     var continueText: String
     var stopText: String
     var experimentText: String
+    var usedSnapshotIDsText: String?
     var statusRaw: String
     var approvedAt: Date?
     var approvedBy: String
@@ -770,6 +771,7 @@ final class BrandWeeklyReview {
         continueText: String = "",
         stopText: String = "",
         experimentText: String = "",
+        usedSnapshotIDsText: String? = nil,
         status: BrandReviewStatus = .drafting,
         approvedAt: Date? = nil,
         approvedBy: String = "",
@@ -792,6 +794,7 @@ final class BrandWeeklyReview {
         self.continueText = continueText
         self.stopText = stopText
         self.experimentText = experimentText
+        self.usedSnapshotIDsText = usedSnapshotIDsText
         self.statusRaw = status.rawValue
         self.approvedAt = approvedAt
         self.approvedBy = approvedBy

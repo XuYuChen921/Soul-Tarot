@@ -31,6 +31,9 @@ struct SoulTowerApp: App {
                             if ProcessInfo.processInfo.arguments.contains("--ui-testing-v06") {
                                 try SeedService.insertV06UITestData(context: container.mainContext)
                             }
+                            if ProcessInfo.processInfo.arguments.contains("--ui-testing-brand-m2") {
+                                try SeedService.insertBrandM2UITestData(context: container.mainContext)
+                            }
                             if ProcessInfo.processInfo.arguments.contains("--ui-testing-v07") {
                                 try SeedService.insertV07UITestData(context: container.mainContext)
                             }
